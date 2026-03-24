@@ -781,9 +781,9 @@
                       <td>
                         Year 1 JH Premium (FYP)
                         <div class="fyp-toggle">
-                          <button class="fyp-btn active" onclick="setFYP(120000)">$120K</button>
+                          <button class="fyp-btn active" onclick="setFYP(70000)">$70K</button>
+                          <button class="fyp-btn" onclick="setFYP(80000)">$80K</button>
                           <button class="fyp-btn" onclick="setFYP(90000)">$90K</button>
-                          <button class="fyp-btn" onclick="setFYP(60000)">$60K</button>
                         </div>
                       </td>
                       <td id="fypAmount" style="color:var(--red) !important;">&minus;$120,000</td>
@@ -878,37 +878,48 @@
       <div class="gmib-banner-value">$145,152/yr</div>
     </div>
 
-    <!-- Three Option Cards (clean) -->
+    <!-- Three Option Cards — Updated 3/24/26 -->
     <div class="option-grid">
       <div class="option-card">
         <div class="option-letter">A</div>
         <div class="option-premium-label">Annual Premium</div>
-        <div class="option-premium">$120,000</div>
+        <div class="option-premium">$70,000</div>
         <div class="option-db-label">Tax-Free Death Benefit</div>
-        <div class="option-db">$6,000,000</div>
-      </div>
-
-      <div class="option-card recommended">
-        <div class="option-letter">B</div>
-        <div class="option-premium-label">Annual Premium</div>
-        <div class="option-premium">$90,000</div>
-        <div class="option-db-label">Tax-Free Death Benefit</div>
-        <div class="option-db">$4,500,000</div>
+        <div class="option-db">~$3,500,000</div>
+        <div class="option-flow">
+          Nassau remainder $65,219<br>+ PRU Term savings $4,000<br>+ Portfolio $781
+        </div>
       </div>
 
       <div class="option-card">
+        <div class="option-letter">B</div>
+        <div class="option-premium-label">Annual Premium</div>
+        <div class="option-premium">$80,000</div>
+        <div class="option-db-label">Tax-Free Death Benefit</div>
+        <div class="option-db">~$4,000,000</div>
+        <div class="option-flow">
+          Nassau remainder $65,219<br>+ PRU Term savings $4,000<br>+ Portfolio $10,781
+        </div>
+      </div>
+
+      <div class="option-card recommended">
         <div class="option-letter">C</div>
         <div class="option-premium-label">Annual Premium</div>
-        <div class="option-premium">$60,000</div>
+        <div class="option-premium">$90,000</div>
         <div class="option-db-label">Tax-Free Death Benefit</div>
-        <div class="option-db">$3,000,000</div>
+        <div class="option-db">~$4,500,000</div>
+        <div class="option-flow">
+          Nassau remainder $65,219<br>+ PRU Term savings $4,000<br>+ Portfolio $20,781
+        </div>
       </div>
     </div>
 
     <div class="question-callout">
-      <h3>How Much Legacy Do You Want?</h3>
+      <h3>Income Is Secured at $12,900/mo — This Is About Legacy</h3>
       <p>
-        All three options are fully funded by the GMIB. Pick the death benefit that fits your family.
+        Every $10,000 in additional annual premium creates approximately $500,000 in additional
+        tax-free death benefit. Option A requires virtually nothing beyond Nassau + PRU Term savings.
+        Options B and C tap a portion of portfolio income.
       </p>
     </div>
 
@@ -927,7 +938,7 @@
     This is not investment advice. Consult your tax advisor for your specific situation.
     Iowa does not tax retirement income distributions (IRA, pension, annuity).
     John Hancock death benefit illustrations are based on assumed crediting rates and are not guaranteed.
-    Updated March 20, 2026.
+    Updated March 24, 2026.
   </div>
 </div>
 
@@ -968,7 +979,7 @@
   ];
   var FIXED_TOTAL_VALUE = 642000;
   var RESERVES_LIQUID = 50000;
-  var currentFYP = 120000; // default Option A
+  var currentFYP = 70000; // default Option A — baseline
 
   function setFYP(amount) {
     currentFYP = amount;
