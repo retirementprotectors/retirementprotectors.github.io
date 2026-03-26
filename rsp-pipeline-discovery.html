@@ -97,6 +97,9 @@
   <h1>RSP-PIPELINE</h1>
   <div class="subtitle">Retirement Sales Process &mdash; Pipeline Studio Module for ProDashX</div>
   <div class="badge">FORGE Sprint: RSP-PIPELINE</div>
+  <div style="margin-top:12px;font-size:0.75rem;color:var(--text-muted);font-family:'SF Mono',monospace;">
+    Sprint: RSP-PIPELINE &bull; 15 tickets &bull; TRK-RSP-001 &rarr; TRK-RSP-015 &bull; discovery_url: https://retirementprotectors.github.io/rsp-pipeline-discovery.html
+  </div>
 </div>
 <div class="tab-container">
   <div class="tabs">
@@ -298,7 +301,7 @@
     <div class="spec-grid">
       <div class="spec-card">
         <h4>RPI Auth Forms ("Authorization Lite")</h4>
-        <p>RPI-made forms pre-populated from ProDashX: Life Auth (6 illustration checkboxes), Wealth Auth, ITS Auth, HIPAA, AOR. These authorize RPI to request data on the client's behalf from carriers and custodians.</p>
+        <p>RPI-made forms pre-populated from ProDashX &mdash; <strong>generated per person in the household</strong> (husband + wife each get their own set). Life Auth (6 illustration checkboxes), Wealth Auth, ITS Auth, HIPAA, AOR. These authorize RPI to request data on the client's behalf from carriers and custodians. For simplicity, one PDF kit covers both spouses with each person's forms clearly labeled.</p>
       </div>
       <div class="spec-card cyan">
         <h4>Access Center &mdash; Portal/API OAuth</h4>
@@ -403,9 +406,9 @@
     <p>One button &rarr; single PDF package for in-home meetings. Generated at <strong>Household level</strong> when applicable &mdash; includes both spouses' profiles, all accounts across the household, and auth forms for each person.</p>
     <table>
       <tr><th>#</th><th>Section</th><th>Content</th></tr>
-      <tr><td>1</td><td>Client Profile Sheet</td><td>Ai3 data formatted for review. Known data printed, gaps highlighted.</td></tr>
+      <tr><td>1</td><td>Client + Spouse Profile Sheets</td><td>Ai3 data at Household level. Both spouses' profiles. Known data printed, gaps highlighted for SPC to fill at the kitchen table.</td></tr>
       <tr><td>2</td><td>Account Detail Sheets</td><td>One per account. Known data + blanks for SPC to fill.</td></tr>
-      <tr><td>3</td><td>Auth Forms</td><td>Pre-filled from ProDashX. Life (6 checkboxes), Wealth, ITS, HIPAA.</td></tr>
+      <tr><td>3</td><td>Auth Forms (per person)</td><td>Pre-filled from ProDashX. One set per spouse: Life (6 checkboxes), Wealth, ITS, HIPAA. Clearly labeled H + W.</td></tr>
       <tr><td>4</td><td>Brochures</td><td>Selected by account type. Education tools for the SPC.</td></tr>
     </table>
   </div>
@@ -413,8 +416,8 @@
     <h2>Auth Form Templates (DEX)</h2>
     <table>
       <tr><th>Form</th><th>Status</th><th>Key Fields</th></tr>
-      <tr><td>Life Insurance Auth</td><td><span class="pill missing">CREATE</span></td><td>6 illustration checkboxes (current perf, face solve, premium solve, lower face, lower premium, term conversion)</td></tr>
-      <tr><td>ITS/Trust Auth</td><td><span class="pill missing">CREATE</span></td><td>Trust structure analysis + estate doc access</td></tr>
+      <tr><td>Life Insurance Auth</td><td><span class="pill missing">CREATE</span></td><td>Per-person (H+W). 6 illustration checkboxes: current perf, face solve, premium solve, lower face, lower premium, term conversion</td></tr>
+      <tr><td>ITS/Trust Auth</td><td><span class="pill missing">CREATE</span></td><td>Per-person (H+W). Trust structure analysis + estate planning doc access + trustee designations</td></tr>
       <tr><td>Wealth Auth</td><td><span class="pill exists">EXISTS</span></td><td>Wire pre-fill from ProDashX</td></tr>
       <tr><td>HIPAA Auth</td><td><span class="pill exists">EXISTS</span></td><td>Wire into DEX form library</td></tr>
       <tr><td>Financial Data Request</td><td><span class="pill exists">EXISTS</span></td><td>Wire into DEX form library</td></tr>
@@ -459,6 +462,21 @@ services/api/src/scripts/
   <div class="card">
     <h2>RSP-PIPELINE &mdash; 15 Tickets, 4 Phases</h2>
     <p>Phase 1 parallel. Phases 2+3 depend on Phase 1. Phase 4 depends on 2+3.</p>
+  </div>
+  <div class="card" style="border-left: 4px solid var(--cyan);">
+    <h2 style="color:var(--cyan);">RONIN Seeder Metadata</h2>
+    <table>
+      <tr><th>Field</th><th>Value</th></tr>
+      <tr><td><code>data-cwd</code></td><td><code>/Users/joshd.millang/Projects/toMachina</code></td></tr>
+      <tr><td><code>sprint_name</code></td><td>RSP-PIPELINE</td></tr>
+      <tr><td><code>discovery_url</code></td><td><code>https://retirementprotectors.github.io/rsp-pipeline-discovery.html</code></td></tr>
+      <tr><td><code>ticket_range</code></td><td>TRK-RSP-001 &rarr; TRK-RSP-015</td></tr>
+      <tr><td><code>ticket_count</code></td><td>15</td></tr>
+      <tr><td><code>phases</code></td><td>4 (Foundation &rarr; Discovery &rarr; Blue Gate &rarr; Integration)</td></tr>
+      <tr><td><code>max_parallelism</code></td><td>4 agents (Phase 1)</td></tr>
+      <tr><td><code>critical_path</code></td><td>TRK-RSP-001 &rarr; TRK-RSP-005 &rarr; TRK-RSP-013</td></tr>
+      <tr><td><code>external_blockers</code></td><td>None &mdash; all dependencies are internal to toMachina</td></tr>
+    </table>
   </div>
   <div class="card">
     <h2>Sprint Plan</h2>
