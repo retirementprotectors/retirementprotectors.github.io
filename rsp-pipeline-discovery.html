@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en" data-cwd="/Users/joshd.millang/Projects/toMachina">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RSP-PIPELINE — FORGE Discovery Document</title>
+<style>
+  :root {
+    --bg: #0a0e17;
+    --bg-card: #111827;
+    --bg-hover: #1a2236;
+    --border: #1e293b;
+    --text: #e2e8f0;
+    --text-muted: #94a3b8;
+    --accent: #3b82f6;
+    --accent-glow: rgba(59, 130, 246, 0.15);
+    --green: #22c55e;
+    --orange: #f59e0b;
+    --red: #ef4444;
+    --purple: #a855f7;
+    --pink: #ec4899;
+    --cyan: #06b6d4;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+  .header { background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%); border-bottom: 1px solid var(--border); padding: 40px 32px; text-align: center; }
+  .header h1 { font-size: 2.5rem; font-weight: 800; background: linear-gradient(135deg, var(--orange), var(--red), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px; }
+  .header .subtitle { font-size: 1.1rem; color: var(--text-muted); max-width: 700px; margin: 0 auto; }
+  .header .badge { display: inline-block; margin-top: 16px; padding: 4px 16px; border-radius: 999px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; background: var(--accent-glow); color: var(--accent); border: 1px solid rgba(59,130,246,0.3); }
+  .tab-container { position: sticky; top: 0; z-index: 100; background: var(--bg); border-bottom: 1px solid var(--border); overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .tabs { display: flex; max-width: 1200px; margin: 0 auto; padding: 0 16px; gap: 0; }
+  .tab { padding: 14px 20px; cursor: pointer; font-size: 0.85rem; font-weight: 500; color: var(--text-muted); border-bottom: 2px solid transparent; white-space: nowrap; transition: all 0.2s; }
+  .tab:hover { color: var(--text); background: var(--bg-hover); }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); background: var(--accent-glow); }
+  .content { max-width: 1200px; margin: 0 auto; padding: 32px 24px; }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+  .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+  .card h2 { font-size: 1.3rem; font-weight: 700; margin-bottom: 16px; color: var(--text); }
+  .card h3 { font-size: 1rem; font-weight: 600; margin: 16px 0 8px; color: var(--accent); }
+  .card p { color: var(--text-muted); margin-bottom: 12px; }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 0.875rem; }
+  th { text-align: left; padding: 10px 12px; background: var(--bg-hover); color: var(--accent); font-weight: 600; border-bottom: 1px solid var(--border); }
+  td { padding: 10px 12px; border-bottom: 1px solid var(--border); color: var(--text-muted); }
+  tr:hover td { background: var(--bg-hover); }
+  .diagram { background: #0d1117; border: 1px solid var(--border); border-radius: 8px; padding: 24px; overflow-x: auto; font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace; font-size: 0.8rem; line-height: 1.5; color: var(--text-muted); white-space: pre; margin: 16px 0; }
+  .spec-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin: 16px 0; }
+  .spec-card { background: var(--bg-hover); border: 1px solid var(--border); border-radius: 8px; padding: 16px; border-top: 3px solid var(--accent); }
+  .spec-card.green { border-top-color: var(--green); }
+  .spec-card.orange { border-top-color: var(--orange); }
+  .spec-card.cyan { border-top-color: var(--cyan); }
+  .spec-card.purple { border-top-color: var(--purple); }
+  .spec-card.red { border-top-color: var(--red); }
+  .spec-card h4 { font-size: 1rem; margin-bottom: 8px; }
+  .spec-card p { font-size: 0.85rem; color: var(--text-muted); margin: 0; }
+  .level-bar { padding: 16px; margin-bottom: 8px; border-radius: 8px; border-left: 4px solid var(--accent); }
+  .level-bar.green { border-left-color: var(--green); background: rgba(34,197,94,0.08); }
+  .level-bar.orange { border-left-color: var(--orange); background: rgba(245,158,11,0.08); }
+  .level-bar.blue { border-left-color: var(--accent); background: rgba(59,130,246,0.08); }
+  .level-bar.purple { border-left-color: var(--purple); background: rgba(168,85,247,0.08); }
+  .gate-callout { padding: 20px; border-radius: 10px; margin-bottom: 16px; background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.25); border-left: 4px solid var(--orange); }
+  .gate-callout h4 { color: var(--orange); margin-bottom: 8px; font-size: 0.95rem; }
+  .gate-callout p { font-size: 0.85rem; color: var(--text-muted); margin: 0; }
+  .ticket-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 12px; margin: 16px 0; }
+  .ticket { background: var(--bg-hover); border: 1px solid var(--border); border-radius: 8px; padding: 16px; border-left: 4px solid var(--accent); }
+  .ticket.t-orange { border-left-color: var(--orange); }
+  .ticket.t-green { border-left-color: var(--green); }
+  .ticket.t-purple { border-left-color: var(--purple); }
+  .ticket .ticket-id { font-family: 'SF Mono', monospace; font-size: 0.75rem; font-weight: 700; color: var(--accent); margin-bottom: 6px; }
+  .ticket.t-orange .ticket-id { color: var(--orange); }
+  .ticket.t-green .ticket-id { color: var(--green); }
+  .ticket.t-purple .ticket-id { color: var(--purple); }
+  .ticket h4 { font-size: 0.95rem; margin-bottom: 6px; }
+  .ticket p { font-size: 0.83rem; color: var(--text-muted); margin: 0; }
+  code { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.8rem; background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 4px; color: var(--cyan); }
+  .pill { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+  .pill.built { background: rgba(34,197,94,0.15); color: var(--green); }
+  .pill.exists { background: rgba(59,130,246,0.15); color: var(--accent); }
+  .pill.stub { background: rgba(245,158,11,0.2); color: var(--orange); }
+  .pill.missing { background: rgba(239,68,68,0.15); color: var(--red); }
+  .pill.feat { background: rgba(168,85,247,0.15); color: var(--purple); }
+  .pill.chore { background: rgba(59,130,246,0.15); color: var(--accent); }
+  .stage-flow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 16px 0; padding: 20px; background: #0d1117; border-radius: 8px; border: 1px solid var(--border); }
+  .stage-box { padding: 10px 16px; border-radius: 8px; font-weight: 700; font-size: 0.85rem; text-align: center; min-width: 80px; }
+  .stage-box.s-orange { background: rgba(245,158,11,0.2); color: var(--orange); border: 1px solid rgba(245,158,11,0.4); }
+  .stage-box.s-blue { background: rgba(59,130,246,0.2); color: var(--accent); border: 1px solid rgba(59,130,246,0.4); }
+  .stage-box.s-yellow { background: rgba(234,179,8,0.2); color: #eab308; border: 1px solid rgba(234,179,8,0.4); }
+  .stage-box.s-green { background: rgba(34,197,94,0.2); color: var(--green); border: 1px solid rgba(34,197,94,0.4); }
+  .stage-box.s-red { background: rgba(239,68,68,0.2); color: var(--red); border: 1px solid rgba(239,68,68,0.4); }
+  .stage-box.s-meeting { background: rgba(168,85,247,0.15); color: var(--purple); border: 1px dashed rgba(168,85,247,0.5); font-size: 0.75rem; }
+  .stage-arrow { color: var(--text-muted); font-size: 1.2rem; }
+  .footer { text-align: center; padding: 32px; color: var(--text-muted); font-size: 0.8rem; border-top: 1px solid var(--border); margin-top: 40px; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>RSP-PIPELINE</h1>
+  <div class="subtitle">Retirement Sales Process &mdash; Pipeline Studio Module for ProDashX</div>
+  <div class="badge">FORGE Sprint: RSP-PIPELINE</div>
+</div>
+<div class="tab-container">
+  <div class="tabs">
+    <div class="tab active" data-tab="vision">Vision</div>
+    <div class="tab" data-tab="current">Current State</div>
+    <div class="tab" data-tab="architecture">Architecture</div>
+    <div class="tab" data-tab="pipeline">Pipeline Design</div>
+    <div class="tab" data-tab="data">Data Model</div>
+    <div class="tab" data-tab="kit">F2F Kit &amp; Auth</div>
+    <div class="tab" data-tab="files">Files</div>
+    <div class="tab" data-tab="sprint">Sprint Plan</div>
+  </div>
+</div>
+<div class="content">
+
+<!-- TAB 1: VISION -->
+<div class="tab-panel active" id="vision">
+  <div class="card">
+    <h2>The Problem</h2>
+    <p>RPI's Retirement Sales Process (RSP) lives in a 75-tab Google Doc playbook and physical forms. SPCs run the 4-color pipeline (Orange &rarr; Blue &rarr; Yellow &rarr; Green &rarr; Red) manually. Virtual meetings have no digital equivalent of the kitchen-table discovery experience. Data collected on paper gets re-entered into ProDashX later. There's no stage gate enforcement &mdash; cases can advance to Yellow with an incomplete picture. Like a doctor reading MRI results before the treadmill test comes back.</p>
+  </div>
+  <div class="card">
+    <h2>The Solution</h2>
+    <p>Build RSP as a <strong>Pipeline Studio Module</strong> published into ProDash's Sales section. The pipeline IS the playbook &mdash; each stage maps to the 4-color process with built-in data collection, authorization form generation, and stage gate enforcement.</p>
+    <div class="spec-grid">
+      <div class="spec-card orange">
+        <h4>Two Meeting Modes</h4>
+        <p><strong>Virtual:</strong> SPC walks ProDashX UI live with the client. Client Profile = the conversation. Account Details = the deep dive. DocuSign fires auth forms pre-filled.<br><br><strong>F2F:</strong> One button prints Client Profile + Account Details + Auth Forms + Brochures as a single PDF kit for the kitchen table.</p>
+      </div>
+      <div class="spec-card cyan">
+        <h4>Fact Finders Already Exist</h4>
+        <p>Client Profile (Ai3 fields) = Client Fact Finder. Account Detail views (Life/Annuity/Medicare/Investment) = Account Fact Finders. "Here's what we HAVE on you. What's MISSING?" The forms just unlock Blue Stage to get the rest.</p>
+      </div>
+      <div class="spec-card purple">
+        <h4>Module, Not App</h4>
+        <p>RSP is a <strong>process</strong> &mdash; left to right, stage gates. Portal-branded, Sales section. The railroad tracks. The Apps it calls (ProZone, DEX, QUE) are the stations.</p>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <h2>Three Meetings as Stage Transitions</h2>
+    <div class="stage-flow">
+      <div class="stage-box s-orange">ORANGE</div>
+      <div class="stage-arrow">&rarr;</div>
+      <div class="stage-box s-meeting">DISCOVERY<br>MEETING</div>
+      <div class="stage-arrow">&rarr;</div>
+      <div class="stage-box s-blue">BLUE</div>
+      <div class="stage-arrow">&rarr;</div>
+      <div class="stage-box s-yellow">YELLOW</div>
+      <div class="stage-arrow">&rarr;</div>
+      <div class="stage-box s-green">GREEN</div>
+      <div class="stage-arrow">&rarr;</div>
+      <div class="stage-box s-meeting">A+R<br>MEETING</div>
+      <div class="stage-arrow">&rarr;</div>
+      <div class="stage-box s-red">RED</div>
+      <div class="stage-arrow">&rarr;</div>
+      <div class="stage-box s-meeting">IMPLEMENT<br>MEETING</div>
+      <div class="stage-arrow">&rarr;</div>
+      <div class="stage-box" style="background:rgba(6,182,212,0.2);color:var(--cyan);border:1px solid rgba(6,182,212,0.4);">SERVICE</div>
+    </div>
+    <p><strong>Discovery Meeting</strong> (Orange &rarr; Blue): Collect data + educate. Brochures are TOOLS &mdash; same content whether virtual or print. Build credibility, get authorizations signed. Don't sell. Just collect.</p>
+    <p><strong>A+R Meeting</strong> (Green &rarr; Red): HAVE vs NEED. How RPI closes the gap. Tiered by client type (85% / 5% / 5%).</p>
+    <p><strong>Implementation Meeting</strong> (after Red): Hand off to service. Plug into ongoing model (RMD, Beni, Access Centers).</p>
+  </div>
+  <div class="card">
+    <h2>The One-Liner</h2>
+    <p style="font-size:1.2rem;color:var(--text);font-weight:600;text-align:center;padding:16px 0;">The Playbook becomes the Pipeline. The kitchen table becomes the screen. The data is the same either way.</p>
+  </div>
+</div>
+
+<!-- TAB 2: CURRENT STATE -->
+<div class="tab-panel" id="current">
+  <div class="card">
+    <h2>What Exists Today</h2>
+    <table>
+      <tr><th>Component</th><th>Status</th><th>What It Does</th><th>Gap</th></tr>
+      <tr><td>Pipeline Studio</td><td><span class="pill built">BUILT</span></td><td>5-layer deep pipeline builder + admin CRUD</td><td>No RSP pipeline configured yet</td></tr>
+      <tr><td>Sales Team Playbook</td><td><span class="pill exists">EXISTS</span></td><td>75-tab process bible &mdash; 4 color stages, scripts, forms, tools</td><td>Manual/paper &mdash; not executable</td></tr>
+      <tr><td>RSP Color Map</td><td><span class="pill exists">EXISTS</span></td><td>Extracted Playbook &rarr; structured process map</td><td>Reference only</td></tr>
+      <tr><td>Client Profile (Ai3)</td><td><span class="pill built">BUILT</span></td><td>Contact + Household fields in ProDashX</td><td>Field completeness audit needed</td></tr>
+      <tr><td>Account Details</td><td><span class="pill built">BUILT</span></td><td>Per-product-line detail views</td><td>Field completeness audit needed</td></tr>
+      <tr><td>DEX</td><td><span class="pill built">BUILT</span></td><td>Document management, form library, kit builder</td><td>Needs RSP auth form templates</td></tr>
+      <tr><td>ProZone</td><td><span class="pill built">BUILT</span></td><td>Territory-based prospecting</td><td>Needs Orange handoff flow</td></tr>
+      <tr><td>Comms Module</td><td><span class="pill built">BUILT</span></td><td>Call/SMS/email (Twilio live)</td><td>Ready for Orange outreach</td></tr>
+      <tr><td>QUE-Medicare</td><td><span class="pill built">BUILT</span></td><td>CSG API quoting</td><td>Yellow hook needed</td></tr>
+      <tr><td>QUE-Life / Annuity / Investment</td><td><span class="pill stub">STUB</span></td><td>Placeholders</td><td>Future sprints &mdash; hooks only</td></tr>
+      <tr><td>Template System</td><td><span class="pill exists">EXISTS</span></td><td>9 Google Doc templates with {{vars}}</td><td>Wire into DEX</td></tr>
+      <tr><td>Physical Brochures</td><td><span class="pill exists">EXISTS</span></td><td>IRA Basics, Life, Medicare, Retirement, Investment, P&amp;C</td><td>Digital parity (RSP-EDUCATE sprint)</td></tr>
+      <tr><td>Auth Forms (Life + ITS)</td><td><span class="pill missing">MISSING</span></td><td>Life Auth (6 checkboxes) + Trust Auth</td><td>Needs creation in DEX</td></tr>
+      <tr><td>F2F Kit Generator</td><td><span class="pill missing">MISSING</span></td><td>Print all discovery docs as one PDF</td><td>Needs creation</td></tr>
+      <tr><td>Blue Stage Gate</td><td><span class="pill missing">MISSING</span></td><td>Block Yellow until picture complete</td><td>Needs creation</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- TAB 3: ARCHITECTURE -->
+<div class="tab-panel" id="architecture">
+  <div class="card">
+    <h2>Where RSP Lives in toMachina</h2>
+    <div class="diagram">ProZone (App) ───&gt; PROSPECT enters Orange
+                       |
+    +------------------+-------------------------------+
+    |          RSP-PIPELINE MODULE                      |
+    |       (Published from Pipeline Studio)            |
+    |       (Portal-branded, Sales section)             |
+    |                                                   |
+    |  ORANGE ----&gt; Discovery Meeting ----&gt; BLUE        |
+    |  (book it)    (collect + educate)     (get data)  |
+    |                     |                             |
+    |            [F2F Kit / Virtual UI]                  |
+    |            [Auth Forms / DocuSign]                 |
+    |            [Brochures = education tools]           |
+    |                                                   |
+    |  BLUE ---------- Gate Check ----------&gt; YELLOW    |
+    |  (complete picture)                   (build case) |
+    |        |                                  |       |
+    |  [DEX: reports]                    [QUE stubs]    |
+    |  [Carrier portals]                 [Casework]     |
+    |  [Signal Wealth]                   [Tier 1/2/3]   |
+    |                                                   |
+    |  GREEN ----&gt; A+R Meeting ----&gt; RED                |
+    |  (present)   (close)            (booked!)         |
+    |                                                   |
+    |  RED ----&gt; Implementation Meeting ----&gt; SERVICE   |
+    |            [DEX: NewBiz kit]                       |
+    |            [RMD + Beni + Access Centers]           |
+    +---------------------------------------------------+</div>
+  </div>
+  <div class="card">
+    <h2>Technical Stack</h2>
+    <table>
+      <tr><th>Layer</th><th>Location</th><th>Purpose</th></tr>
+      <tr><td>Pipeline Config</td><td><code>packages/core/flow/</code></td><td>Stage definitions, sub-stages, gate logic, transitions</td></tr>
+      <tr><td>Module UI</td><td><code>packages/ui/src/modules/</code></td><td>RSPDiscovery, RSPBlueGate, RSPStageCard components</td></tr>
+      <tr><td>API Routes</td><td><code>services/api/src/routes/</code></td><td>rsp.ts + rsp-auth-forms.ts</td></tr>
+      <tr><td>Pipeline Instance</td><td><code>packages/ui/src/modules/PipelineInstance/</code></td><td>Existing Kanban renderer &mdash; RSP publishes into this</td></tr>
+      <tr><td>Firestore</td><td><code>flow_pipelines</code></td><td>Pipeline config + instance state</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- TAB 4: PIPELINE DESIGN -->
+<div class="tab-panel" id="pipeline">
+  <div class="card" style="border-left: 4px solid var(--orange);">
+    <h2 style="color:var(--orange);">ORANGE &mdash; Book Discovery (COR)</h2>
+    <p><strong>Sub-stages:</strong> CONNECT &rarr; CLOSE &rarr; NO &rarr; LATER &rarr; CAN'T REACH</p>
+    <p>ProZone prospect &rarr; new Opportunity. COR contacts via Comms (call &rarr; text &rarr; email). Campaign script + MYST delivery. Book the Discovery Meeting.</p>
+  </div>
+  <div class="card" style="border-left: 4px solid var(--purple);">
+    <h2 style="color:var(--purple);">DISCOVERY MEETING &mdash; Transition Event</h2>
+    <div class="spec-grid">
+      <div class="spec-card purple">
+        <h4>Virtual / Phone</h4>
+        <p>SPC walks Client Profile + Account Details in ProDashX live. Empty fields = questions. Brochures on screen share = education tools. DocuSign fires auth forms pre-filled.</p>
+      </div>
+      <div class="spec-card orange">
+        <h4>F2F / In-Home</h4>
+        <p>F2F Kit printed: Client Profile + Account Details + Auth forms + Brochures. Kitchen table review. Returns with signed forms + filled gaps.</p>
+      </div>
+    </div>
+    <p><strong>Brochures are TOOLS.</strong> Same exact content virtual or print. Educate &rarr; build credibility &rarr; get authorizations signed &rarr; move to Blue. DO NOT sell. Just COLLECT.</p>
+  </div>
+  <div class="card" style="border-left: 4px solid var(--accent);">
+    <h2 style="color:var(--accent);">BLUE &mdash; Complete the Picture (AST-1)</h2>
+    <p><strong>Phase 1:</strong> Authorization &amp; Data Collection (Life Auth w/ 6 checkboxes, Wealth, ITS, AOR)</p>
+    <p><strong>Phase 2:</strong> Systems Integration (fill ALL ProDashX fields &mdash; no gaps, no guesses)</p>
+    <p><strong>Phase 3:</strong> Report Ordering (carrier portals, Signal Wealth, in-force illustrations)</p>
+    <div class="gate-callout">
+      <h4>BLUE GATE &mdash; The Doctor Analogy</h4>
+      <p>Pipeline BLOCKS advancement to Yellow until ALL required fields populated AND all reports received. Like a doctor: don't read results while tests are still pending. Complete picture FIRST, then Yellow.</p>
+    </div>
+  </div>
+  <div class="card" style="border-left: 4px solid #eab308;">
+    <h2 style="color:#eab308;">YELLOW &mdash; Build the Case (AST-2)</h2>
+    <p><strong>Phase 1:</strong> Analysis + Quoting (QUE-Life/Annuity/Medicare/Investment stubs)</p>
+    <p><strong>Phase 2:</strong> Casework Components ("12 arrows" &mdash; Tier 1/2/3 progressive disclosure)</p>
+    <p><strong>Phase 3:</strong> Package Assembly (AI3 PDF + Reports + Illustrations + Casework)</p>
+    <p><em>QUE stubs = architectural hooks. Links to Apps, not full integrations.</em></p>
+  </div>
+  <div class="card" style="border-left: 4px solid var(--green);">
+    <h2 style="color:var(--green);">GREEN &mdash; Present + Close (SPC)</h2>
+    <p><strong>Sub-stages:</strong> CONNECT &rarr; CLOSE &rarr; NO &rarr; LATER &rarr; RESCHD</p>
+    <p>SPC uses Yellow package. HAVE vs NEED. A+R Meeting transitions to Red.</p>
+  </div>
+  <div class="card" style="border-left: 4px solid var(--red);">
+    <h2 style="color:var(--red);">RED &mdash; Booked / NewBiz Handoff</h2>
+    <p>Implementation Meeting. DEX generates NewBiz kit. Service team takes over. Client enters RMD + Beni + Access Centers.</p>
+  </div>
+</div>
+
+<!-- TAB 5: DATA MODEL -->
+<div class="tab-panel" id="data">
+  <div class="card">
+    <h2>Virtual Fact Finder = ProDashX Fields</h2>
+    <p>No separate fact finder documents. Client Profile IS the client FF. Account Details ARE the account FFs.</p>
+  </div>
+  <div class="card">
+    <h2>Client Profile (Ai3) Required Fields</h2>
+    <table>
+      <tr><th>Category</th><th>Fields</th></tr>
+      <tr><td>Personal</td><td>Name, DOB, SSN (last 4), address, phone, email</td></tr>
+      <tr><td>Spouse</td><td>Name, DOB, SSN (last 4), phone, email</td></tr>
+      <tr><td>Employment</td><td>Status, employer, retirement date/age, income</td></tr>
+      <tr><td>Social Security</td><td>Claiming age, est. benefit, spouse claiming, spouse benefit</td></tr>
+      <tr><td>Objectives</td><td>Primary goal, risk tolerance, time horizon, income needs</td></tr>
+      <tr><td>Auth Status</td><td>Life (Y/N), Wealth (Y/N), ITS (Y/N), HIPAA (Y/N), SOA (Y/N)</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h2>Account Details &mdash; Per Product Line</h2>
+    <div class="spec-grid">
+      <div class="spec-card red"><h4>Life Insurance</h4><p>Carrier, policy #, type, face amount, premium, cash value, issue date, surrender period, beneficiary, 6 illustration checkboxes</p></div>
+      <div class="spec-card orange"><h4>Annuity</h4><p>Carrier, contract #, type (FIA/MYGA/VA), value, surrender schedule, riders, income benefit, allocation, MVA, fees</p></div>
+      <div class="spec-card cyan"><h4>Medicare</h4><p>Medicare #, Part A effective, plan type, carrier, premium, PCP, specialists, prescriptions, county, enrollment window</p></div>
+      <div class="spec-card green"><h4>Investment</h4><p>Custodian, account #, type (IRA/Roth/NQ/Trust), value, allocation, fees, risk score, performance</p></div>
+    </div>
+  </div>
+  <div class="card">
+    <h2>Blue Gate Completion Logic</h2>
+    <table>
+      <tr><th>Category</th><th>Gate Check</th><th>Weight</th></tr>
+      <tr><td>Client Profile</td><td>All required Ai3 fields populated</td><td>30%</td></tr>
+      <tr><td>Account Details</td><td>All required fields per account type</td><td>30%</td></tr>
+      <tr><td>Auth Forms</td><td>All applicable auths signed</td><td>20%</td></tr>
+      <tr><td>Reports</td><td>All ordered reports received + filed</td><td>20%</td></tr>
+    </table>
+    <p><strong>100% = gate opens.</strong> Anything less shows exactly what's missing.</p>
+  </div>
+</div>
+
+<!-- TAB 6: F2F KIT & AUTH -->
+<div class="tab-panel" id="kit">
+  <div class="card">
+    <h2>F2F Kit Generator</h2>
+    <p>One button &rarr; single PDF package for in-home meetings:</p>
+    <table>
+      <tr><th>#</th><th>Section</th><th>Content</th></tr>
+      <tr><td>1</td><td>Client Profile Sheet</td><td>Ai3 data formatted for review. Known data printed, gaps highlighted.</td></tr>
+      <tr><td>2</td><td>Account Detail Sheets</td><td>One per account. Known data + blanks for SPC to fill.</td></tr>
+      <tr><td>3</td><td>Auth Forms</td><td>Pre-filled from ProDashX. Life (6 checkboxes), Wealth, ITS, HIPAA.</td></tr>
+      <tr><td>4</td><td>Brochures</td><td>Selected by account type. Education tools for the SPC.</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h2>Auth Form Templates (DEX)</h2>
+    <table>
+      <tr><th>Form</th><th>Status</th><th>Key Fields</th></tr>
+      <tr><td>Life Insurance Auth</td><td><span class="pill missing">CREATE</span></td><td>6 illustration checkboxes (current perf, face solve, premium solve, lower face, lower premium, term conversion)</td></tr>
+      <tr><td>ITS/Trust Auth</td><td><span class="pill missing">CREATE</span></td><td>Trust structure analysis + estate doc access</td></tr>
+      <tr><td>Wealth Auth</td><td><span class="pill exists">EXISTS</span></td><td>Wire pre-fill from ProDashX</td></tr>
+      <tr><td>HIPAA Auth</td><td><span class="pill exists">EXISTS</span></td><td>Wire into DEX form library</td></tr>
+      <tr><td>Financial Data Request</td><td><span class="pill exists">EXISTS</span></td><td>Wire into DEX form library</td></tr>
+      <tr><td>CMS SOA</td><td><span class="pill exists">EXISTS</span></td><td>Medicare existing flow</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- TAB 7: FILES -->
+<div class="tab-panel" id="files">
+  <div class="card">
+    <h2>File Structure</h2>
+    <div class="diagram">packages/core/flow/
++-- rsp-pipeline-config.ts          # 5 stages, sub-stages, gate defs
++-- rsp-stage-gates.ts              # Blue gate: field + report completion
++-- rsp-transitions.ts              # Meeting transition handlers
+
+packages/ui/src/modules/
++-- RSPDiscovery/
+|   +-- RSPDiscoveryPanel.tsx       # Main panel (virtual + F2F toggle)
+|   +-- RSPClientProfile.tsx        # Ai3 fields as interactive form
+|   +-- RSPAccountReview.tsx        # Account details per product line
+|   +-- RSPAuthStatus.tsx           # Auth tracking dashboard
+|   +-- RSPKitGenerator.tsx         # F2F Kit PDF builder
++-- RSPBlueGate/
+|   +-- RSPBlueGate.tsx             # Gate enforcement UI (% complete)
+|   +-- RSPReportTracker.tsx        # Track ordered/received reports
++-- RSPStageCard/
+    +-- RSPStageCard.tsx            # Enhanced card with RSP context
+
+services/api/src/routes/
++-- rsp.ts                          # Kit gen, gate checks, transitions
++-- rsp-auth-forms.ts               # Auth template CRUD + DocuSign
+
+services/api/src/scripts/
++-- seed-rsp-pipeline.ts            # Seed pipeline into Firestore</div>
+  </div>
+</div>
+
+<!-- TAB 8: SPRINT PLAN -->
+<div class="tab-panel" id="sprint">
+  <div class="card">
+    <h2>RSP-PIPELINE &mdash; 15 Tickets, 4 Phases</h2>
+    <p>Phase 1 parallel. Phases 2+3 depend on Phase 1. Phase 4 depends on 2+3.</p>
+  </div>
+  <div class="card">
+    <h2>Sprint Plan</h2>
+    <table>
+      <tr><th>TRK ID</th><th>Title</th><th>Type</th><th>Description / Acceptance Criteria</th></tr>
+      <tr><td><code>TRK-RSP-001</code></td><td>RSP Pipeline Config</td><td><span class="pill feat">feat</span></td><td>File: <code>packages/core/flow/rsp-pipeline-config.ts</code>. Define RSP with 5 stages, sub-stages per Playbook, 3 meeting transitions. Seed to Firestore. <strong>AC:</strong> Pipeline in Pipeline Studio admin, all stages render in Kanban.</td></tr>
+      <tr><td><code>TRK-RSP-002</code></td><td>ProZone &rarr; Orange Handoff</td><td><span class="pill feat">feat</span></td><td>File: <code>ProZone/FlowTab.tsx</code> + <code>routes/rsp.ts</code>. "Start RSP" on ProZone prospect creates Orange card with client linked. <strong>AC:</strong> Click &rarr; new RSP card in Orange.</td></tr>
+      <tr><td><code>TRK-RSP-003</code></td><td>RSP Stage Gates</td><td><span class="pill feat">feat</span></td><td>File: <code>rsp-stage-gates.ts</code>. Blue gate: query Client + Account fields + report flags. Return % + missing items. Block if &lt;100%. <strong>AC:</strong> Incomplete shows "72% &mdash; 4 missing", blocks advance.</td></tr>
+      <tr><td><code>TRK-RSP-004</code></td><td>Auth Form Templates in DEX</td><td><span class="pill feat">feat</span></td><td>File: <code>routes/rsp-auth-forms.ts</code>. Create Life Auth (6 checkboxes) + ITS Auth. Wire existing Wealth/HIPAA/Financial. <strong>AC:</strong> All 6 auth forms in DEX, pre-fillable.</td></tr>
+      <tr><td><code>TRK-RSP-005</code></td><td>RSP Discovery Panel</td><td><span class="pill feat">feat</span></td><td>File: <code>RSPDiscovery/RSPDiscoveryPanel.tsx</code>. Main panel at Orange&rarr;Blue transition. Client Profile + Account Review + Auth Status. <strong>AC:</strong> Opens from card, Ai3 fields editable, account tabs, auth tracking.</td></tr>
+      <tr><td><code>TRK-RSP-006</code></td><td>RSP Client Profile (Ai3 Form)</td><td><span class="pill feat">feat</span></td><td>File: <code>RSPDiscovery/RSPClientProfile.tsx</code>. All Ai3 fields grouped by category. "Have data" vs "need data" indicators. Pre-populates. <strong>AC:</strong> Loads data, gaps highlighted, save writes Firestore.</td></tr>
+      <tr><td><code>TRK-RSP-007</code></td><td>RSP Account Review</td><td><span class="pill feat">feat</span></td><td>File: <code>RSPDiscovery/RSPAccountReview.tsx</code>. Tabbed by product line. Gap count badges. Add-new-account flow. <strong>AC:</strong> Tabs render, gap badges, inline edit saves to accounts subcollection.</td></tr>
+      <tr><td><code>TRK-RSP-008</code></td><td>RSP Auth Status Dashboard</td><td><span class="pill feat">feat</span></td><td>File: <code>RSPDiscovery/RSPAuthStatus.tsx</code>. Per-form status: Not Started &rarr; Sent &rarr; Signed &rarr; Filed. DocuSign trigger. <strong>AC:</strong> All auths shown, DocuSign fires pre-filled, status updates on signature.</td></tr>
+      <tr><td><code>TRK-RSP-009</code></td><td>F2F Kit Generator</td><td><span class="pill feat">feat</span></td><td>File: <code>RSPDiscovery/RSPKitGenerator.tsx</code> + <code>routes/rsp.ts</code>. One button &rarr; PDF: Client Profile + Account Details + Auth Forms + Brochures. <strong>AC:</strong> Click &rarr; PDF downloads, all sections pre-filled, printable.</td></tr>
+      <tr><td><code>TRK-RSP-010</code></td><td>Blue Gate UI</td><td><span class="pill feat">feat</span></td><td>File: <code>RSPBlueGate/RSPBlueGate.tsx</code>. Progress ring, categorized missing items, cannot-advance state. <strong>AC:</strong> % complete shown, blocker list if incomplete, advance at 100%.</td></tr>
+      <tr><td><code>TRK-RSP-011</code></td><td>Report Tracker</td><td><span class="pill feat">feat</span></td><td>File: <code>RSPBlueGate/RSPReportTracker.tsx</code>. Per-account: Not Ordered &rarr; Ordered &rarr; Received &rarr; Filed. <strong>AC:</strong> Auto-generates from accounts, status toggles, feeds Blue Gate calc.</td></tr>
+      <tr><td><code>TRK-RSP-012</code></td><td>RSP Seed + Publish</td><td><span class="pill chore">chore</span></td><td>File: <code>scripts/seed-rsp-pipeline.ts</code>. Seed pipeline to Firestore. Publish as Module in Sales section. <strong>AC:</strong> RSP in sidebar under Sales, role-based visibility.</td></tr>
+      <tr><td><code>TRK-RSP-013</code></td><td>Yellow QUE Hooks</td><td><span class="pill feat">feat</span></td><td>File: <code>rsp-transitions.ts</code>. Yellow card surfaces QUE app links based on account types. Stub only. <strong>AC:</strong> Yellow with life account shows "Open QUE-Life".</td></tr>
+      <tr><td><code>TRK-RSP-014</code></td><td>Green&rarr;Red A+R Transition</td><td><span class="pill feat">feat</span></td><td>File: <code>rsp-transitions.ts</code>. Schedule A+R meeting. Attach Yellow case package. <strong>AC:</strong> Button &rarr; calendar event + package attached &rarr; advances to Red.</td></tr>
+      <tr><td><code>TRK-RSP-015</code></td><td>Red&rarr;Service Handoff</td><td><span class="pill feat">feat</span></td><td>File: <code>rsp-transitions.ts</code> + <code>routes/rsp.ts</code>. DEX generates NewBiz kit. Auto-creates service pipeline cards. <strong>AC:</strong> Implementation &rarr; NewBiz kit &rarr; service cards created.</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h2>Sequencing</h2>
+    <div class="level-bar blue">
+      <h4>Phase 1: Foundation (TRK-RSP-001 &mdash; 004) &mdash; PARALLEL</h4>
+      <p>Pipeline config, ProZone handoff, gate logic, auth form templates. All independent &mdash; 4 parallel agents.</p>
+    </div>
+    <div class="level-bar orange">
+      <h4>Phase 2: Discovery Experience (TRK-RSP-005 &mdash; 009) &mdash; Depends on 001</h4>
+      <p>Discovery Panel, Client Profile, Account Review, Auth Status, F2F Kit. Pipeline must exist first.</p>
+    </div>
+    <div class="level-bar green">
+      <h4>Phase 3: Blue Gate (TRK-RSP-010 &mdash; 012) &mdash; Depends on 003</h4>
+      <p>Gate UI, Report Tracker, seed + publish. Gate logic must exist first.</p>
+    </div>
+    <div class="level-bar purple">
+      <h4>Phase 4: Integration (TRK-RSP-013 &mdash; 015) &mdash; Depends on Phase 2 + 3</h4>
+      <p>QUE hooks, A+R transition, service handoff. Full pipeline + Discovery required.</p>
+    </div>
+  </div>
+  <div class="card">
+    <h2>Definition of Done</h2>
+    <table>
+      <tr><th>Criterion</th><th>Verification</th></tr>
+      <tr><td>RSP visible in ProDash Sales sidebar</td><td>Seed runs, sidebar shows RSP module</td></tr>
+      <tr><td>ProZone prospect converts to Orange</td><td>"Start RSP" creates card with client linked</td></tr>
+      <tr><td>Orange&rarr;Blue launches Discovery Panel</td><td>Transition &rarr; panel opens with client data</td></tr>
+      <tr><td>Virtual Discovery fills fields</td><td>Edit &rarr; save &rarr; Firestore updated</td></tr>
+      <tr><td>F2F Kit generates printable PDF</td><td>Click &rarr; PDF with all sections</td></tr>
+      <tr><td>Auth forms fire via DocuSign</td><td>Send &rarr; pre-filled form &rarr; status updates</td></tr>
+      <tr><td>Blue Gate blocks incomplete</td><td>Missing data &rarr; blocker list shown</td></tr>
+      <tr><td>Blue Gate allows complete</td><td>100% &rarr; advance succeeds</td></tr>
+      <tr><td>Yellow shows QUE stubs</td><td>Life account &rarr; "Open QUE-Life"</td></tr>
+      <tr><td>Green&rarr;Red A+R meeting</td><td>Schedule &rarr; calendar + package</td></tr>
+      <tr><td>Red&rarr;Service handoff</td><td>Implementation &rarr; NewBiz + service cards</td></tr>
+      <tr><td>RSP is Module not App</td><td>Portal-branded, Sales section</td></tr>
+    </table>
+  </div>
+</div>
+
+</div>
+<div class="footer">RSP-PIPELINE &mdash; FORGE Sprint &mdash; Retirement Sales Process Module &mdash; The Machine &mdash; 2026-03-26</div>
+<script>
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      const target = tab.dataset.tab;
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById(target).classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>
