@@ -240,50 +240,119 @@
 
 <!-- TAB 4: PIPELINE DESIGN -->
 <div class="tab-panel" id="pipeline">
+  <div class="card">
+    <h2>The RSP Pipeline &mdash; Stage by Stage</h2>
+    <div class="stage-flow">
+      <div class="stage-box s-orange">ORANGE</div>
+      <div class="stage-arrow">&rarr;</div>
+      <div class="stage-box s-meeting">DISCOVERY<br>MEETING</div>
+      <div class="stage-arrow">&rarr;</div>
+      <div class="stage-box s-blue">BLUE</div>
+      <div class="stage-arrow">&rarr;</div>
+      <div class="stage-box s-yellow">YELLOW</div>
+      <div class="stage-arrow">&rarr;</div>
+      <div class="stage-box s-green">GREEN</div>
+      <div class="stage-arrow">&rarr;</div>
+      <div class="stage-box s-meeting">A+R<br>MEETING</div>
+      <div class="stage-arrow">&rarr;</div>
+      <div class="stage-box s-red">RED</div>
+      <div class="stage-arrow">&rarr;</div>
+      <div class="stage-box s-meeting">IMPLEMENT<br>MEETING</div>
+      <div class="stage-arrow">&rarr;</div>
+      <div class="stage-box" style="background:rgba(6,182,212,0.2);color:var(--cyan);border:1px solid rgba(6,182,212,0.4);">SERVICE</div>
+    </div>
+  </div>
+
   <div class="card" style="border-left: 4px solid var(--orange);">
     <h2 style="color:var(--orange);">ORANGE &mdash; Book Discovery (COR)</h2>
     <p><strong>Sub-stages:</strong> CONNECT &rarr; CLOSE &rarr; NO &rarr; LATER &rarr; CAN'T REACH</p>
-    <p>ProZone prospect &rarr; new Opportunity. COR contacts via Comms (call &rarr; text &rarr; email). Campaign script + MYST delivery. Book the Discovery Meeting.</p>
+    <p><strong>Entry:</strong> Booked meeting at end of ProZone pipeline <strong>auto-transitions</strong> the client off ProZone and creates an RSP Orange card. No manual handoff &mdash; the booking IS the trigger.</p>
+    <p>COR contacts via Comms (call &rarr; text &rarr; email). Campaign script + MYST delivery. Books the Discovery Meeting &mdash; in-person, phone, or GMeet.</p>
+    <div class="gate-callout">
+      <h4>ProZone &rarr; RSP Auto-Transition</h4>
+      <p>When a prospect reaches "Booked" in ProZone, the system automatically creates an RSP pipeline card in Orange with the client/household linked. ProZone card closes. RSP card opens. Zero manual steps.</p>
+    </div>
   </div>
+
   <div class="card" style="border-left: 4px solid var(--purple);">
-    <h2 style="color:var(--purple);">DISCOVERY MEETING &mdash; Transition Event</h2>
+    <h2 style="color:var(--purple);">DISCOVERY MEETING &mdash; Transition (Orange &rarr; Blue)</h2>
+    <p>This happens BETWEEN Orange and Blue. The meeting itself is the transition event.</p>
     <div class="spec-grid">
       <div class="spec-card purple">
         <h4>Virtual / Phone</h4>
-        <p>SPC walks Client Profile + Account Details in ProDashX live. Empty fields = questions. Brochures on screen share = education tools. DocuSign fires auth forms pre-filled.</p>
+        <p>SPC walks Client Profile + Account Details in ProDashX live with the client. Empty fields = the questions. Brochures on screen share = education tools to build credibility. DocuSign fires auth forms pre-filled from ProDashX data.</p>
       </div>
       <div class="spec-card orange">
         <h4>F2F / In-Home</h4>
-        <p>F2F Kit printed: Client Profile + Account Details + Auth forms + Brochures. Kitchen table review. Returns with signed forms + filled gaps.</p>
+        <p>F2F Kit generated at <strong>Household level</strong> (if applicable): Client + Spouse profiles, all accounts across the household, auth forms pre-filled, brochures selected by account type. SPC takes the kit to the kitchen table. Returns with signed forms + filled gaps.</p>
       </div>
     </div>
-    <p><strong>Brochures are TOOLS.</strong> Same exact content virtual or print. Educate &rarr; build credibility &rarr; get authorizations signed &rarr; move to Blue. DO NOT sell. Just COLLECT.</p>
+    <p><strong>Brochures are TOOLS, not leave-behinds.</strong> The SPC uses them to educate the client about what they have &mdash; exact same content whether virtual presentation or physical handout. Build credibility so the client is comfortable signing authorizations. "Let me educate you on what you have, so when I ask you to sign this form, you don't tell me to fuck off."</p>
+    <p><strong>Goal:</strong> "What you've got" &rarr; "I need more info on your stuff" &rarr; get authorizations signed &rarr; move to Blue. DO NOT sell. DO NOT recommend. Just COLLECT.</p>
   </div>
+
   <div class="card" style="border-left: 4px solid var(--accent);">
     <h2 style="color:var(--accent);">BLUE &mdash; Complete the Picture (AST-1)</h2>
-    <p><strong>Phase 1:</strong> Authorization &amp; Data Collection (Life Auth w/ 6 checkboxes, Wealth, ITS, AOR)</p>
-    <p><strong>Phase 2:</strong> Systems Integration (fill ALL ProDashX fields &mdash; no gaps, no guesses)</p>
-    <p><strong>Phase 3:</strong> Report Ordering (carrier portals, Signal Wealth, in-force illustrations)</p>
+    <p><strong>Phase 1: Authorization &amp; Data Collection</strong></p>
+    <p>Process signed auth forms. Two layers:</p>
+    <div class="spec-grid">
+      <div class="spec-card">
+        <h4>RPI Auth Forms ("Authorization Lite")</h4>
+        <p>RPI-made forms pre-populated from ProDashX: Life Auth (6 illustration checkboxes), Wealth Auth, ITS Auth, HIPAA, AOR. These authorize RPI to request data on the client's behalf from carriers and custodians.</p>
+      </div>
+      <div class="spec-card cyan">
+        <h4>Access Center &mdash; Portal/API OAuth</h4>
+        <p>The "real deal" &mdash; client credentials for direct portal access. Auto-generated from accounts:<br>
+        &bull; <strong>Carrier portals</strong> (per account &mdash; Ameritas, NAC, etc.)<br>
+        &bull; <strong>Carrier Connect</strong> (Medicare Blue Button data)<br>
+        &bull; <strong>Medicare.gov</strong><br>
+        &bull; <strong>Social Security / SSA.gov</strong><br>
+        &bull; <strong>IRS.gov</strong><br>
+        &bull; <strong>MasterCard</strong> (Financial &amp; Insurance)<br>
+        Status tracking: not_started &rarr; requested &rarr; authorized &rarr; active</p>
+      </div>
+    </div>
+    <p><strong>Phase 2: Systems Integration</strong> &mdash; Fill ALL ProDashX fields. Client Profile complete. Every Account Detail complete. No gaps, no guesses.</p>
+    <p><strong>Phase 3: Report Ordering</strong> &mdash; Use authorizations + Access Center credentials to order ALL reports. Carrier portals for in-force illustrations. Signal Wealth for investment analysis. Every report received and filed in ACF.</p>
     <div class="gate-callout">
       <h4>BLUE GATE &mdash; The Doctor Analogy</h4>
-      <p>Pipeline BLOCKS advancement to Yellow until ALL required fields populated AND all reports received. Like a doctor: don't read results while tests are still pending. Complete picture FIRST, then Yellow.</p>
+      <p>Pipeline BLOCKS advancement to Yellow until ALL required fields populated, ALL auth forms signed, ALL Access Center items activated, AND all reports received. Like a doctor: you don't sit down with the patient to discuss results when half the tests are still pending. "Let's get the rest done so I can see the full picture &mdash; THEN we'll talk." Complete picture FIRST.</p>
     </div>
   </div>
+
   <div class="card" style="border-left: 4px solid #eab308;">
     <h2 style="color:#eab308;">YELLOW &mdash; Build the Case (AST-2)</h2>
-    <p><strong>Phase 1:</strong> Analysis + Quoting (QUE-Life/Annuity/Medicare/Investment stubs)</p>
-    <p><strong>Phase 2:</strong> Casework Components ("12 arrows" &mdash; Tier 1/2/3 progressive disclosure)</p>
-    <p><strong>Phase 3:</strong> Package Assembly (AI3 PDF + Reports + Illustrations + Casework)</p>
-    <p><em>QUE stubs = architectural hooks. Links to Apps, not full integrations.</em></p>
+    <p><strong>Phase 1: Analysis + Quoting</strong> &mdash; Calls QUE-Life/Annuity/Medicare/Investment (stubs for now &mdash; future App integrations). "Can we beat it?" determination per account.</p>
+    <p><strong>Phase 2: Casework Components</strong> &mdash; "12 arrows in your quiver." Progressive disclosure: 85-90% decide from AI3 + Reports alone. 5% need product illustrations. 5% need detailed casework deep-dives.</p>
+    <p><strong>Phase 3: Package Assembly</strong> &mdash; AI3 PDF + Reports + Illustrations + Casework. Tiered by client type (Tier 1 / Tier 2 / Tier 3). All filed to ACF B4 Recommendations folder.</p>
+    <p><em>QUE stubs = architectural hooks only. "Open QUE-Life" links to the App. Full integrations ship in dedicated QUE sprints.</em></p>
   </div>
+
   <div class="card" style="border-left: 4px solid var(--green);">
     <h2 style="color:var(--green);">GREEN &mdash; Present + Close (SPC)</h2>
     <p><strong>Sub-stages:</strong> CONNECT &rarr; CLOSE &rarr; NO &rarr; LATER &rarr; RESCHD</p>
-    <p>SPC uses Yellow package. HAVE vs NEED. A+R Meeting transitions to Red.</p>
+    <p>SPC uses Yellow case package. HAVE vs NEED &mdash; here's what you've got, here's what you need, here's how we close that gap. New products we can sell, OR rework what they have, OR "you're good &mdash; we verified everything checks out."</p>
+    <p>Only recommend when we KNOW we're a good fit AND we can provide value.</p>
   </div>
+
+  <div class="card" style="border-left: 4px solid var(--purple);">
+    <h2 style="color:var(--purple);">A+R MEETING &mdash; Transition (Green &rarr; Red)</h2>
+    <p>Analysis &amp; Recommendation meeting. Yellow case package attached to meeting invite. SPC presents using tiered scripts (Tier 1: summary, Tier 2: detail, Tier 3: deep dive). Close or walk away with integrity.</p>
+  </div>
+
   <div class="card" style="border-left: 4px solid var(--red);">
-    <h2 style="color:var(--red);">RED &mdash; Booked / NewBiz Handoff</h2>
-    <p>Implementation Meeting. DEX generates NewBiz kit. Service team takes over. Client enters RMD + Beni + Access Centers.</p>
+    <h2 style="color:var(--red);">RED &mdash; Booked / NewBiz</h2>
+    <p>Deal is closed. NewBiz paperwork in progress.</p>
+  </div>
+
+  <div class="card" style="border-left: 4px solid var(--purple);">
+    <h2 style="color:var(--purple);">IMPLEMENTATION MEETING &mdash; Transition (Red &rarr; Service)</h2>
+    <p>In-person, virtual, or phone. Hand off to service team. DEX generates NewBiz form kit. Client plugged into ongoing product + service model:</p>
+    <p>&bull; <strong>RMD Center</strong> &mdash; distribution planning &amp; tracking<br>
+    &bull; <strong>Beni Center</strong> &mdash; beneficiary management<br>
+    &bull; <strong>Access Center</strong> &mdash; portal credentials maintained<br>
+    &bull; <strong>Comms</strong> &mdash; ongoing touch campaigns + annual reviews</p>
+    <p>Auto-creates service pipeline cards per activated product line.</p>
   </div>
 </div>
 
@@ -291,7 +360,7 @@
 <div class="tab-panel" id="data">
   <div class="card">
     <h2>Virtual Fact Finder = ProDashX Fields</h2>
-    <p>No separate fact finder documents. Client Profile IS the client FF. Account Details ARE the account FFs.</p>
+    <p>No separate fact finder documents. Client Profile IS the client FF. Account Details ARE the account FFs. Both pulled from and created at <strong>Household level</strong> when applicable &mdash; the Ai3 is a household picture, not just an individual.</p>
   </div>
   <div class="card">
     <h2>Client Profile (Ai3) Required Fields</h2>
@@ -331,7 +400,7 @@
 <div class="tab-panel" id="kit">
   <div class="card">
     <h2>F2F Kit Generator</h2>
-    <p>One button &rarr; single PDF package for in-home meetings:</p>
+    <p>One button &rarr; single PDF package for in-home meetings. Generated at <strong>Household level</strong> when applicable &mdash; includes both spouses' profiles, all accounts across the household, and auth forms for each person.</p>
     <table>
       <tr><th>#</th><th>Section</th><th>Content</th></tr>
       <tr><td>1</td><td>Client Profile Sheet</td><td>Ai3 data formatted for review. Known data printed, gaps highlighted.</td></tr>
@@ -396,14 +465,14 @@ services/api/src/scripts/
     <table>
       <tr><th>TRK ID</th><th>Title</th><th>Type</th><th>Description / Acceptance Criteria</th></tr>
       <tr><td><code>TRK-RSP-001</code></td><td>RSP Pipeline Config</td><td><span class="pill feat">feat</span></td><td>File: <code>packages/core/flow/rsp-pipeline-config.ts</code>. Define RSP with 5 stages, sub-stages per Playbook, 3 meeting transitions. Seed to Firestore. <strong>AC:</strong> Pipeline in Pipeline Studio admin, all stages render in Kanban.</td></tr>
-      <tr><td><code>TRK-RSP-002</code></td><td>ProZone &rarr; Orange Handoff</td><td><span class="pill feat">feat</span></td><td>File: <code>ProZone/FlowTab.tsx</code> + <code>routes/rsp.ts</code>. "Start RSP" on ProZone prospect creates Orange card with client linked. <strong>AC:</strong> Click &rarr; new RSP card in Orange.</td></tr>
+      <tr><td><code>TRK-RSP-002</code></td><td>ProZone &rarr; Orange Handoff</td><td><span class="pill feat">feat</span></td><td>File: <code>ProZone/FlowTab.tsx</code> + <code>routes/rsp.ts</code>. When prospect reaches "Booked" in ProZone pipeline, auto-create RSP Orange card with client/household linked. ProZone card closes. No manual handoff. <strong>AC:</strong> Book meeting in ProZone &rarr; RSP Orange card auto-created with client linked, ProZone card marked complete.</td></tr>
       <tr><td><code>TRK-RSP-003</code></td><td>RSP Stage Gates</td><td><span class="pill feat">feat</span></td><td>File: <code>rsp-stage-gates.ts</code>. Blue gate: query Client + Account fields + report flags. Return % + missing items. Block if &lt;100%. <strong>AC:</strong> Incomplete shows "72% &mdash; 4 missing", blocks advance.</td></tr>
-      <tr><td><code>TRK-RSP-004</code></td><td>Auth Form Templates in DEX</td><td><span class="pill feat">feat</span></td><td>File: <code>routes/rsp-auth-forms.ts</code>. Create Life Auth (6 checkboxes) + ITS Auth. Wire existing Wealth/HIPAA/Financial. <strong>AC:</strong> All 6 auth forms in DEX, pre-fillable.</td></tr>
+      <tr><td><code>TRK-RSP-004</code></td><td>Auth Form Templates in DEX</td><td><span class="pill feat">feat</span></td><td>File: <code>routes/rsp-auth-forms.ts</code>. Create Life Auth (6 checkboxes) + ITS Auth templates in DEX. Wire existing Wealth/HIPAA/Financial. RPI auth forms are pre-populated "Authorization Lite" &mdash; the signed forms authorize Blue Stage data access. Also wire Access Center auto-generate to fire on Blue Stage entry (carrier portals + Medicare.gov + SSA.gov + IRS.gov + MasterCard). <strong>AC:</strong> All 6 auth forms in DEX pre-fillable. Access Center items auto-generated from accounts when Blue starts.</td></tr>
       <tr><td><code>TRK-RSP-005</code></td><td>RSP Discovery Panel</td><td><span class="pill feat">feat</span></td><td>File: <code>RSPDiscovery/RSPDiscoveryPanel.tsx</code>. Main panel at Orange&rarr;Blue transition. Client Profile + Account Review + Auth Status. <strong>AC:</strong> Opens from card, Ai3 fields editable, account tabs, auth tracking.</td></tr>
       <tr><td><code>TRK-RSP-006</code></td><td>RSP Client Profile (Ai3 Form)</td><td><span class="pill feat">feat</span></td><td>File: <code>RSPDiscovery/RSPClientProfile.tsx</code>. All Ai3 fields grouped by category. "Have data" vs "need data" indicators. Pre-populates. <strong>AC:</strong> Loads data, gaps highlighted, save writes Firestore.</td></tr>
       <tr><td><code>TRK-RSP-007</code></td><td>RSP Account Review</td><td><span class="pill feat">feat</span></td><td>File: <code>RSPDiscovery/RSPAccountReview.tsx</code>. Tabbed by product line. Gap count badges. Add-new-account flow. <strong>AC:</strong> Tabs render, gap badges, inline edit saves to accounts subcollection.</td></tr>
       <tr><td><code>TRK-RSP-008</code></td><td>RSP Auth Status Dashboard</td><td><span class="pill feat">feat</span></td><td>File: <code>RSPDiscovery/RSPAuthStatus.tsx</code>. Per-form status: Not Started &rarr; Sent &rarr; Signed &rarr; Filed. DocuSign trigger. <strong>AC:</strong> All auths shown, DocuSign fires pre-filled, status updates on signature.</td></tr>
-      <tr><td><code>TRK-RSP-009</code></td><td>F2F Kit Generator</td><td><span class="pill feat">feat</span></td><td>File: <code>RSPDiscovery/RSPKitGenerator.tsx</code> + <code>routes/rsp.ts</code>. One button &rarr; PDF: Client Profile + Account Details + Auth Forms + Brochures. <strong>AC:</strong> Click &rarr; PDF downloads, all sections pre-filled, printable.</td></tr>
+      <tr><td><code>TRK-RSP-009</code></td><td>F2F Kit Generator</td><td><span class="pill feat">feat</span></td><td>File: <code>RSPDiscovery/RSPKitGenerator.tsx</code> + <code>routes/rsp.ts</code>. One button &rarr; PDF at Household level: Client + Spouse profiles, all accounts across household, auth forms per person (pre-filled), brochures by account type. <strong>AC:</strong> Click &rarr; PDF downloads with household data, all sections pre-filled, printable.</td></tr>
       <tr><td><code>TRK-RSP-010</code></td><td>Blue Gate UI</td><td><span class="pill feat">feat</span></td><td>File: <code>RSPBlueGate/RSPBlueGate.tsx</code>. Progress ring, categorized missing items, cannot-advance state. <strong>AC:</strong> % complete shown, blocker list if incomplete, advance at 100%.</td></tr>
       <tr><td><code>TRK-RSP-011</code></td><td>Report Tracker</td><td><span class="pill feat">feat</span></td><td>File: <code>RSPBlueGate/RSPReportTracker.tsx</code>. Per-account: Not Ordered &rarr; Ordered &rarr; Received &rarr; Filed. <strong>AC:</strong> Auto-generates from accounts, status toggles, feeds Blue Gate calc.</td></tr>
       <tr><td><code>TRK-RSP-012</code></td><td>RSP Seed + Publish</td><td><span class="pill chore">chore</span></td><td>File: <code>scripts/seed-rsp-pipeline.ts</code>. Seed pipeline to Firestore. Publish as Module in Sales section. <strong>AC:</strong> RSP in sidebar under Sales, role-based visibility.</td></tr>
