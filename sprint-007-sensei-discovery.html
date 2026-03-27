@@ -124,7 +124,7 @@
 <div class="tab-panel active" id="vision">
   <div class="card">
     <h2>The Problem</h2>
-    <p>JDM answers the same questions over and over. "How do I use Households?" "Where's the pipeline?" "What happened to that feature?" Every question burns CEO time. RAIDEN has a <code>TRAIN</code> triage outcome built in &mdash; but no training content to point to. VOLTRON can walk someone through anything &mdash; but has no knowledge base to draw from. The team gets trained once, forgets, and asks again.</p>
+    <p>JDM answers the same questions over and over. "How do I use Households?" "Where's the pipeline?" "What happened to that feature?" Every question burns CEO time. <a href="https://retirementprotectors.github.io/sprint-004-raiden-discovery.html" style="color:var(--red);text-decoration:none;border-bottom:1px dashed var(--red);">RAIDEN</a> has a <code>TRAIN</code> triage outcome built in &mdash; but no training content to point to. <a href="https://retirementprotectors.github.io/sprint-001-voltron-foundation-discovery.html" style="color:var(--blue);text-decoration:none;border-bottom:1px dashed var(--blue);">VOLTRON</a> can walk someone through anything &mdash; but has no knowledge base to draw from. The team gets trained once, forgets, and asks again.</p>
     <p>Meanwhile, CI already screenshots <strong>every single UI state</strong> on every deploy via Playwright. The raw material for always-current training exists. It's just not organized, templated, or accessible.</p>
   </div>
   <div class="card">
@@ -141,7 +141,7 @@
       </div>
       <div class="spec-card red">
         <h4>3. Knowledge Wiring</h4>
-        <p><strong>RAIDEN:</strong> Ticket about something that exists &rarr; "We already have that. Here's the training." &rarr; ticket closed. No human in loop.<br><br><strong>VOLTRON:</strong> "How do I use Households?" &rarr; pulls SENSEI content &rarr; walks them through conversationally. Same content, two delivery mechanisms.</p>
+        <p><strong><a href="https://retirementprotectors.github.io/sprint-004-raiden-discovery.html" style="color:var(--red);text-decoration:none;">RAIDEN</a>:</strong> Ticket about something that exists &rarr; "We already have that. Here's the training." &rarr; ticket closed. No human in loop.<br><br><strong><a href="https://retirementprotectors.github.io/sprint-002-voltron-action-engine-discovery.html" style="color:var(--blue);text-decoration:none;">VOLTRON</a>:</strong> "How do I use Households?" &rarr; pulls SENSEI content &rarr; walks them through conversationally. Same content, two delivery mechanisms.</p>
       </div>
     </div>
   </div>
@@ -206,8 +206,8 @@ Two Distribution Channels:
       <tr><td><code>screenshot: 'on'</code> in playwright.config</td><td><span class="pill built">BUILT</span></td><td>Captures every UI state automatically</td></tr>
       <tr><td>E2E test names by module</td><td><span class="pill built">BUILT</span></td><td>Screenshot-to-module mapping</td></tr>
       <tr><td>FORGE ticket types</td><td><span class="pill built">BUILT</span></td><td>Content type classification (workflow/ui/feat)</td></tr>
-      <tr><td>RAIDEN TRAIN triage outcome</td><td><span class="pill exists">EXISTS</span></td><td>Route to training docs (currently empty)</td></tr>
-      <tr><td>VOLTRON knowledge queries</td><td><span class="pill exists">EXISTS</span></td><td>Conversational training delivery</td></tr>
+      <tr><td><a href="https://retirementprotectors.github.io/sprint-004-raiden-discovery.html" style="color:var(--red);">RAIDEN</a> TRAIN triage outcome</td><td><span class="pill exists">EXISTS</span></td><td>Route to training docs (currently empty)</td></tr>
+      <tr><td><a href="https://retirementprotectors.github.io/sprint-001-voltron-foundation-discovery.html" style="color:var(--blue);">VOLTRON</a> knowledge queries</td><td><span class="pill exists">EXISTS</span></td><td>Conversational training delivery</td></tr>
       <tr><td>Firebase Storage</td><td><span class="pill built">BUILT</span></td><td>Screenshot hosting + CDN</td></tr>
       <tr><td>ATLAS terminology</td><td><span class="pill built">BUILT</span></td><td>Auto-generated glossaries</td></tr>
       <tr><td>Role/entitlement system</td><td><span class="pill built">BUILT</span></td><td>Role-based training filtering</td></tr>
@@ -311,7 +311,7 @@ Two Distribution Channels:
 <!-- TAB 5: KNOWLEDGE WIRING -->
 <div class="tab-panel" id="wiring">
   <div class="card">
-    <h2>RAIDEN Integration</h2>
+    <h2><a href="https://retirementprotectors.github.io/sprint-004-raiden-discovery.html" style="color:var(--red);text-decoration:none;">RAIDEN</a> Integration</h2>
     <p>RAIDEN's triage already has a <code>TRAIN</code> outcome. Right now it's empty &mdash; no training to point to. SENSEI fills that gap.</p>
     <div class="diagram">Ticket submitted: "I need to see household data"
     |
@@ -333,7 +333,7 @@ RAIDEN triage: Does this feature exist?
     |-- NO --> normal RAIDEN flow (route to FORGE, etc.)</div>
   </div>
   <div class="card">
-    <h2>VOLTRON Integration</h2>
+    <h2><a href="https://retirementprotectors.github.io/sprint-002-voltron-action-engine-discovery.html" style="color:var(--blue);text-decoration:none;">VOLTRON</a> Integration</h2>
     <p>VOLTRON is the conversational access point. Same content, different delivery.</p>
     <div class="diagram">User: "How do I use the RMD Center?"
     |
@@ -416,7 +416,7 @@ packages/core/src/
   </div>
 
   <div class="card" style="border-left: 4px solid var(--cyan);">
-    <h2 style="color:var(--cyan);">RONIN Seeder Metadata</h2>
+    <h2 style="color:var(--cyan);"><a href="https://retirementprotectors.github.io/sprint-005-ronin-autonomy-discovery.html" style="color:var(--cyan);text-decoration:none;">RONIN</a> Seeder Metadata</h2>
     <table>
       <tr><th>Field</th><th>Value</th></tr>
       <tr><td><code>data-cwd</code></td><td><code>/Users/joshd.millang/Projects/toMachina</code></td></tr>
@@ -449,7 +449,7 @@ packages/core/src/
       <tr><td><code>TRK-SNS-011</code></td><td>RAIDEN TRAIN Wiring</td><td><span class="pill feat">feat</span></td><td>File: MDJ agent RAIDEN triage module. When TRAIN outcome fires, query <code>sensei_content</code> for matching module. Return training URL + summary. Auto-close ticket with training link attached. <strong>AC:</strong> Submit ticket about Households &rarr; RAIDEN returns "We have that. Here's the training: [link]" &rarr; ticket closed.</td></tr>
       <tr><td><code>TRK-SNS-012</code></td><td>VOLTRON SENSEI Queries</td><td><span class="pill feat">feat</span></td><td>File: MDJ agent VOLTRON knowledge module. Add sensei_content as knowledge source. "How do I use X?" queries SENSEI for module X, returns training content for conversational walkthrough. <strong>AC:</strong> "How do I use RMD Center?" &rarr; VOLTRON walks through steps with screenshots.</td></tr>
       <tr><td><code>TRK-SNS-013</code></td><td>CI Pipeline Integration</td><td><span class="pill infra">infra</span></td><td>File: <code>.github/workflows/</code> (existing CI). Add post-deploy step after E2E tests pass: run <code>upload-screenshots.ts</code>, trigger <code>sensei-generator</code> for changed modules. Only regenerates training for modules whose screenshots changed. <strong>AC:</strong> Deploy with UI changes &rarr; training auto-updated. Deploy without UI changes &rarr; no regeneration.</td></tr>
-      <tr><td><code>TRK-SNS-014</code></td><td>SENSEI Heat Map + Analytics</td><td><span class="pill feat">feat</span></td><td>File: <code>services/api/src/routes/sensei.ts</code>. Log every RAIDEN TRAIN response + every VOLTRON SENSEI query + every SENSEI Mode popup view. Aggregate by module. Surface top-10 most-queried modules in FORGE dashboard. <strong>AC:</strong> After 1 week, can see which modules get the most training requests.</td></tr>
+      <tr><td><code>TRK-SNS-014</code></td><td>SENSEI Heat Map + Analytics</td><td><span class="pill feat">feat</span></td><td>File: <code>services/api/src/routes/sensei.ts</code>. Log every RAIDEN TRAIN response + every VOLTRON SENSEI query + every SENSEI Mode popup view. Aggregate by module. Surface top-10 most-queried modules in <a href="https://retirementprotectors.github.io/forge-runner-discovery.html" style="color:var(--accent);text-decoration:none;">FORGE</a> dashboard. <strong>AC:</strong> After 1 week, can see which modules get the most training requests.</td></tr>
     </table>
   </div>
 
