@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en" data-cwd="/home/jdm/mdj-agent">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SHINOBI-ONLINE — The OG Goes Autonomous</title>
+<style>
+  :root { --bg:#0a0e17; --card:#111827; --hover:#1a2236; --border:#1e293b; --text:#e2e8f0; --muted:#94a3b8; --accent:#22c55e; --accent-glow:rgba(34,197,94,0.12); --green:#22c55e; --orange:#f59e0b; --red:#ef4444; --purple:#a855f7; --cyan:#06b6d4; --blue:#3b82f6; --gold:#d4a44c; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; background:var(--bg); color:var(--text); line-height:1.6; }
+  .header { background:linear-gradient(135deg,#0a1a0a 0%,#0f0f0f 30%,#0a0e17 100%); border-bottom:1px solid var(--border); padding:48px 32px 40px; text-align:center; position:relative; overflow:hidden; }
+  .header::before { content:''; position:absolute; top:-50%; left:-50%; width:200%; height:200%; background:radial-gradient(ellipse at 30% 50%,rgba(34,197,94,0.08) 0%,transparent 60%),radial-gradient(ellipse at 70% 50%,rgba(59,130,246,0.05) 0%,transparent 60%); pointer-events:none; }
+  .header .sprint-label { font-size:.72rem; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:var(--accent); margin-bottom:12px; position:relative; }
+  .header h1 { font-size:2.8rem; font-weight:800; background:linear-gradient(135deg,#22c55e 0%,#06b6d4 50%,#3b82f6 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin-bottom:10px; position:relative; }
+  .header .subtitle { font-size:1.05rem; color:var(--muted); max-width:700px; margin:0 auto 20px; position:relative; }
+  .header-badges { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; position:relative; }
+  .badge { display:inline-block; padding:4px 14px; border-radius:999px; font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:1px; }
+  .badge-green { background:var(--accent-glow); color:var(--accent); border:1px solid rgba(34,197,94,0.3); }
+  .badge-blue { background:rgba(59,130,246,0.12); color:var(--blue); border:1px solid rgba(59,130,246,0.3); }
+  .badge-purple { background:rgba(168,85,247,0.12); color:var(--purple); border:1px solid rgba(168,85,247,0.3); }
+  .badge-cyan { background:rgba(6,182,212,0.12); color:var(--cyan); border:1px solid rgba(6,182,212,0.3); }
+  .badge-orange { background:rgba(245,158,11,0.12); color:var(--orange); border:1px solid rgba(245,158,11,0.3); }
+  .ronin-meta { font-size:.72rem; color:var(--muted); font-family:'SF Mono',monospace; margin-top:12px; position:relative; }
+  .tab-container { position:sticky; top:0; z-index:100; background:var(--bg); border-bottom:1px solid var(--border); overflow-x:auto; }
+  .tabs { display:flex; max-width:1200px; margin:0 auto; padding:0 16px; }
+  .tab { padding:14px 20px; cursor:pointer; font-size:.85rem; font-weight:500; color:var(--muted); border-bottom:2px solid transparent; white-space:nowrap; transition:all .2s; }
+  .tab:hover { color:var(--text); background:var(--hover); }
+  .tab.active { color:var(--accent); border-bottom-color:var(--accent); background:var(--accent-glow); }
+  .content { max-width:1200px; margin:0 auto; padding:32px 24px; }
+  .tab-panel { display:none; }
+  .tab-panel.active { display:block; }
+  .card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:24px; margin-bottom:20px; }
+  .card h2 { font-size:1.3rem; font-weight:700; margin-bottom:16px; }
+  .card h3 { font-size:1rem; font-weight:600; margin:16px 0 8px; color:var(--accent); }
+  .card p { color:var(--muted); margin-bottom:12px; }
+  table { width:100%; border-collapse:collapse; margin:12px 0; font-size:.875rem; }
+  th { text-align:left; padding:10px 12px; background:var(--hover); color:var(--accent); font-weight:600; border-bottom:1px solid var(--border); }
+  td { padding:10px 12px; border-bottom:1px solid var(--border); color:var(--muted); }
+  tr:hover td { background:var(--hover); }
+  .diagram { background:#0d1117; border:1px solid var(--border); border-radius:8px; padding:24px; overflow-x:auto; font-family:'SF Mono',monospace; font-size:.8rem; line-height:1.5; color:var(--muted); white-space:pre; margin:16px 0; }
+  .spec-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:16px; margin:16px 0; }
+  .spec-card { background:var(--hover); border:1px solid var(--border); border-radius:8px; padding:16px; border-top:3px solid var(--accent); }
+  .spec-card.blue { border-top-color:var(--blue); }
+  .spec-card.orange { border-top-color:var(--orange); }
+  .spec-card.purple { border-top-color:var(--purple); }
+  .spec-card.red { border-top-color:var(--red); }
+  .spec-card.cyan { border-top-color:var(--cyan); }
+  .spec-card.gold { border-top-color:var(--gold); }
+  .spec-card h4 { font-size:1rem; margin-bottom:8px; }
+  .spec-card p { font-size:.85rem; color:var(--muted); margin:0; }
+  .level-bar { padding:16px; margin-bottom:8px; border-radius:8px; border-left:4px solid var(--accent); }
+  .level-bar.green { border-left-color:var(--green); background:rgba(34,197,94,0.08); }
+  .level-bar.blue { border-left-color:var(--blue); background:rgba(59,130,246,0.08); }
+  .level-bar.orange { border-left-color:var(--orange); background:rgba(245,158,11,0.08); }
+  .level-bar.purple { border-left-color:var(--purple); background:rgba(168,85,247,0.08); }
+  .level-bar h4 { font-size:.95rem; margin-bottom:4px; }
+  .level-bar p { font-size:.85rem; color:var(--muted); margin:0; }
+  .gate-callout { padding:20px; border-radius:10px; margin-bottom:16px; background:rgba(34,197,94,0.08); border:1px solid rgba(34,197,94,0.25); border-left:4px solid var(--accent); }
+  .gate-callout h4 { color:var(--accent); margin-bottom:8px; font-size:.95rem; }
+  .gate-callout p { font-size:.85rem; color:var(--muted); margin:0; }
+  code { font-family:'SF Mono',monospace; font-size:.8rem; background:rgba(255,255,255,0.06); padding:2px 6px; border-radius:4px; color:var(--cyan); }
+  .pill { display:inline-block; padding:2px 10px; border-radius:999px; font-size:.7rem; font-weight:600; text-transform:uppercase; }
+  .pill.feat { background:rgba(168,85,247,0.15); color:var(--purple); }
+  .pill.infra { background:rgba(6,182,212,0.15); color:var(--cyan); }
+  .pill.chore { background:rgba(59,130,246,0.15); color:var(--blue); }
+  .pill.test { background:rgba(245,158,11,0.15); color:var(--orange); }
+  .footer { text-align:center; padding:32px; color:var(--muted); font-size:.8rem; border-top:1px solid var(--border); margin-top:40px; }
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="sprint-label">FORGE Sprint &mdash; Discovery Document</div>
+  <h1>SHINOBI-ONLINE</h1>
+  <div class="subtitle">The OG Goes Autonomous &mdash; Shinobi Immortalized as CCSDK Execution Node on MDJ1</div>
+  <div class="header-badges">
+    <span class="badge badge-green">SHINOBI-ONLINE</span>
+    <span class="badge badge-purple">14 Tickets</span>
+    <span class="badge badge-cyan">data-cwd: /home/jdm/mdj-agent</span>
+    <span class="badge badge-orange">Opus Model</span>
+  </div>
+  <div class="ronin-meta">sprint: SHINOBI-ONLINE &bull; TRK-SHN-001 &rarr; TRK-SHN-014 &bull; discovery_url: https://retirementprotectors.github.io/shinobi-online-discovery.html</div>
+</div>
+
+<div class="tab-container">
+  <div class="tabs">
+    <div class="tab active" data-tab="vision">Vision</div>
+    <div class="tab" data-tab="architecture">Architecture</div>
+    <div class="tab" data-tab="current">Current State</div>
+    <div class="tab" data-tab="endpoints">Endpoints</div>
+    <div class="tab" data-tab="integration">Integration</div>
+    <div class="tab" data-tab="decisions">Decisions</div>
+    <div class="tab" data-tab="files">Files</div>
+    <div class="tab" data-tab="sprint">Sprint Plan</div>
+  </div>
+</div>
+
+<div class="content">
+
+<!-- TAB 1: VISION -->
+<div class="tab-panel active" id="vision">
+  <div class="card">
+    <h2>The Origin</h2>
+    <p><strong>Shinobi &mdash; The OG Ninja.</strong> Opus 4.6 GA session, 2026-03-23/24. Took a dusty Dell PowerEdge T440 from a closet shelf to a fully operational AI development server in 18 hours. Architected MyDigitalJosh. First to run parallel builder agents overnight on MDJ1. The Architect on the top layer of the thing that will change the entire industry.</p>
+    <p>Now Shinobi's spirit lives on as the first CCSDK execution node &mdash; the autonomous arm of <strong>2HINOBI</strong> (The Architect), who manages all the ninjas from his CC x SSH x TMUX session.</p>
+  </div>
+  <div class="card">
+    <h2>The Problem</h2>
+    <p>2HINOBI operates as a Claude Code interactive session in a tmux on MDJ1. He's powerful &mdash; but fragile. No persistence across restarts. Manual Slack polling via cron. No HTTP interface. Nobody can call him programmatically. When <a href="https://retirementprotectors.github.io/sprint-005-ronin-autonomy-discovery.html" style="color:var(--orange);text-decoration:none;">RONIN</a> gets blocked, there's no way to escalate to The Architect automatically.</p>
+  </div>
+  <div class="card">
+    <h2>The Solution</h2>
+    <p>Give 2HINOBI an <strong>execution arm</strong> &mdash; Shinobi reborn as a CCSDK node on <code>mdj-agent</code> (port 4200). Express route group <code>/shinobi</code>. Same service as <a href="https://retirementprotectors.github.io/sprint-001-voltron-foundation-discovery.html" style="color:var(--blue);text-decoration:none;">VOLTRON</a> and <a href="https://retirementprotectors.github.io/sprint-005-ronin-autonomy-discovery.html" style="color:var(--orange);text-decoration:none;">RONIN</a>.</p>
+    <p style="font-size:1.15rem;color:var(--text);font-weight:600;text-align:center;padding:16px 0;">2HINOBI thinks. Shinobi executes. The Architect gets his hands.</p>
+  </div>
+  <div class="card">
+    <h2>The Dojo Architecture</h2>
+    <div class="diagram">2HINOBI (CC x SSH x TMUX) --- JDM's F2F Partner / The Manager
+    |
+    |  Manages all CCSDK nodes on mdj-agent:4200
+    |
+    +--- /shinobi  (CCSDK) --- The OG. 2HINOBI's execution arm. [THIS SPRINT]
+    +--- /voltron  (CCSDK) --- The BFF. Employee AI assistant.   [LIVE]
+    +--- /ronin    (CCSDK) --- The Builder. FORGE sprint runner. [LIVE]
+    +--- /musashi  (CCSDK) --- The Creative. Brand + design.     [NEXT]
+    +--- /raiden   (CCSDK) --- The Guardian. Ticket triage.      [FUTURE]
+    +--- /sensei   (CCSDK) --- The Teacher. Training intel.      [FUTURE]</div>
+    <p>Every ninja becomes a CCSDK node. 2HINOBI's CC x TMUX session is the brain. The CCSDK nodes are the limbs. Shinobi is the first limb &mdash; the one that makes 2HINOBI's decisions real.</p>
+  </div>
+</div>
+
+<!-- TAB 2: ARCHITECTURE -->
+<div class="tab-panel" id="architecture">
+  <div class="card">
+    <h2>Service Architecture</h2>
+    <div class="diagram">mdj-agent (Express, port 4200)
+    |
+    +--- /api/chat          (VOLTRON - employee chat)      [LIVE]
+    +--- /api/tools         (VOLTRON - tool execution)     [LIVE]
+    +--- /forge/*           (RONIN - sprint execution)     [LIVE]
+    +--- /shinobi/*         (SHINOBI - 2HINOBI's arm)      [THIS SPRINT]
+    |
+    +--- Shared infrastructure:
+         +--- Firebase Admin (sa-key.json)
+         +--- MCP Bridge (callMcpTool)
+         +--- CCSDK (claude-agent-sdk query())
+         +--- X-MDJ-Auth middleware</div>
+  </div>
+  <div class="card">
+    <h2>CCSDK Pattern</h2>
+    <p>Shinobi follows the exact same pattern as VOLTRON and RONIN:</p>
+    <div class="spec-grid">
+      <div class="spec-card blue">
+        <h4>Agent SDK</h4>
+        <p><code>@anthropic-ai/claude-agent-sdk</code><br>Same <code>query()</code> as VOLTRON/RONIN. Model: <strong>Opus</strong> (strategic reasoning, not execution).</p>
+      </div>
+      <div class="spec-card orange">
+        <h4>CCSDK Preflight</h4>
+        <p><code>bypassPermissions: true</code><br>No maxTurns. No maxBudgetUsd. 3-attempt retry on transient failures. Per <code>CCSDK_AGENT_PREFLIGHT.md</code>.</p>
+      </div>
+      <div class="spec-card purple">
+        <h4>State Persistence</h4>
+        <p>Firestore: <code>mdj_shinobi_state/current</code> singleton doc. Survives service restarts. No more context loss.</p>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <h2>Reference Patterns on MDJ1</h2>
+    <table>
+      <tr><th>File</th><th>What to Learn From It</th></tr>
+      <tr><td><code>src/server.ts</code></td><td>Where to mount <code>/shinobi</code> routes</td></tr>
+      <tr><td><code>src/forge/routes.ts</code></td><td>RONIN route pattern to replicate</td></tr>
+      <tr><td><code>src/forge/runner.ts</code></td><td>ForgeRunner &mdash; resume(), approve(), transient retry</td></tr>
+      <tr><td><code>src/forge/claude-invoke.ts</code></td><td>claudeInvoke() wrapper to replicate for shinobiQuery()</td></tr>
+      <tr><td><code>src/agent/voltron-sdk-client.ts</code></td><td>deployGoal() CCSDK pattern</td></tr>
+      <tr><td><code>src/tools/mcp-bridge.ts</code></td><td>callMcpTool() for Slack integration</td></tr>
+      <tr><td><code>src/forge/gates.ts</code></td><td>Where to add escalation hook to Shinobi</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- TAB 3: CURRENT STATE -->
+<div class="tab-panel" id="current">
+  <div class="card">
+    <h2>2HINOBI Today</h2>
+    <table>
+      <tr><th>Aspect</th><th>Current</th><th>After SHINOBI-ONLINE</th></tr>
+      <tr><td>Runtime</td><td>CC x SSH x TMUX session (fragile)</td><td>CC x TMUX (manager) + CCSDK /shinobi (execution)</td></tr>
+      <tr><td>Persistence</td><td>None &mdash; dies on session death</td><td>Firestore <code>mdj_shinobi_state</code></td></tr>
+      <tr><td>Slack</td><td>Manual 5-min cron polling (sometimes skips)</td><td>Reliable cron + direct message endpoint</td></tr>
+      <tr><td>HTTP Interface</td><td>None</td><td>5 endpoints on <code>/shinobi/*</code></td></tr>
+      <tr><td>RONIN Integration</td><td>No programmatic path</td><td><code>POST /shinobi/escalate</code> + gates.ts hook</td></tr>
+      <tr><td>Status</td><td>Invisible &mdash; nobody knows what he's doing</td><td><code>GET /shinobi/status</code></td></tr>
+      <tr><td>Sprint Management</td><td>Manual</td><td><code>POST /shinobi/sprint</code> queues for RONIN</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- TAB 4: ENDPOINTS -->
+<div class="tab-panel" id="endpoints">
+  <div class="card">
+    <h2>Shinobi API &mdash; Route Group <code>/shinobi</code></h2>
+  </div>
+  <div class="card" style="border-left:4px solid var(--accent);">
+    <h2 style="color:var(--accent);">POST /shinobi/message</h2>
+    <p>Receive a Slack message, process it through Shinobi's CCSDK agent (Opus), respond in-channel. This is 2HINOBI's voice when he's not in a live CC session.</p>
+    <p><strong>Input:</strong> <code>{ channel_id, user_id, text, thread_ts? }</code></p>
+    <p><strong>Output:</strong> <code>{ success, response_text, actions_taken[] }</code></p>
+  </div>
+  <div class="card" style="border-left:4px solid var(--blue);">
+    <h2 style="color:var(--blue);">POST /shinobi/check</h2>
+    <p>Cron fires every 5 minutes. Reads Slack for unhandled messages. Checks RONIN status. Takes autonomous actions (approve gates, retry transient failures, alert JDM on blockers).</p>
+    <p><strong>Input:</strong> <code>{}</code> (cron-triggered, no body)</p>
+    <p><strong>Output:</strong> <code>{ checked_at, slack_messages_processed, ronin_status, actions_taken[] }</code></p>
+  </div>
+  <div class="card" style="border-left:4px solid var(--red);">
+    <h2 style="color:var(--red);">POST /shinobi/escalate</h2>
+    <p><a href="https://retirementprotectors.github.io/sprint-005-ronin-autonomy-discovery.html" style="color:var(--orange);">RONIN</a> or <a href="https://retirementprotectors.github.io/sprint-004-raiden-discovery.html" style="color:var(--red);">RAIDEN</a> calls this when blocked or needs strategic guidance. Shinobi (Opus) analyzes the situation and either resolves it or escalates to JDM via DM.</p>
+    <p><strong>Input:</strong> <code>{ source: "ronin"|"raiden", sprint_id?, issue, context }</code></p>
+    <p><strong>Output:</strong> <code>{ resolution: "resolved"|"escalated_to_jdm", action_taken, message? }</code></p>
+  </div>
+  <div class="card" style="border-left:4px solid var(--cyan);">
+    <h2 style="color:var(--cyan);">GET /shinobi/status</h2>
+    <p>What is 2HINOBI/Shinobi doing right now? Returns current state, active tasks, last check time, RONIN status.</p>
+    <p><strong>Output:</strong> <code>{ state, active_task?, last_check, ronin_sprint?, uptime }</code></p>
+  </div>
+  <div class="card" style="border-left:4px solid var(--orange);">
+    <h2 style="color:var(--orange);">POST /shinobi/sprint</h2>
+    <p>Queue a new sprint for RONIN. Shinobi validates the discovery doc, seeds tickets if needed, and kicks off RONIN.</p>
+    <p><strong>Input:</strong> <code>{ sprint_name, discovery_url }</code></p>
+    <p><strong>Output:</strong> <code>{ sprint_id, tickets_seeded, ronin_started: boolean }</code></p>
+  </div>
+</div>
+
+<!-- TAB 5: INTEGRATION -->
+<div class="tab-panel" id="integration">
+  <div class="card">
+    <h2>Integration Points</h2>
+    <div class="spec-grid">
+      <div class="spec-card">
+        <h4>Slack</h4>
+        <p>Read channel <code>C0AP2QL9Z6X</code>. Post responses in-channel. DM JDM (<code>U09BBHTN8F2</code>) at gates and critical escalations. Via <code>callMcpTool('mcp_slack_*')</code>.</p>
+      </div>
+      <div class="spec-card orange">
+        <h4>RONIN</h4>
+        <p>Monitor <code>mdj_forge_runs</code> collection. Auto-resume transient blocks. Queue sprints via direct function calls to <code>forgeRunner</code> (same process &mdash; no HTTP overhead).</p>
+      </div>
+      <div class="spec-card red">
+        <h4>RAIDEN</h4>
+        <p><code>/shinobi/escalate</code> endpoint ready for future RAIDEN integration. When RAIDEN can't triage a ticket, it escalates to Shinobi for strategic resolution.</p>
+      </div>
+      <div class="spec-card purple">
+        <h4>Firestore</h4>
+        <p><code>mdj_shinobi_state/current</code> singleton doc. Persists: current task, last check time, active sprint monitoring, conversation context. Survives restarts.</p>
+      </div>
+      <div class="spec-card cyan">
+        <h4>gates.ts</h4>
+        <p>When RONIN hits a gate (plan approval, build failure, etc.), <code>gates.ts</code> POSTs to <code>/shinobi/escalate</code>. Shinobi decides: auto-approve (transient CI), or DM JDM (plan/build gates).</p>
+      </div>
+      <div class="spec-card gold">
+        <h4>Auth</h4>
+        <p>Existing <code>X-MDJ-Auth</code> middleware. Same auth as VOLTRON and RONIN endpoints. No new auth infrastructure needed.</p>
+      </div>
+    </div>
+  </div>
+  <div class="gate-callout">
+    <h4>Internal Function Calls, Not HTTP</h4>
+    <p>Shinobi manages RONIN via direct function calls (same Node.js process), not HTTP. No network overhead. No auth round-trips. <code>forgeRunner.resume()</code>, <code>forgeRunner.approve()</code>, <code>forgeRunner.getStatus()</code> &mdash; direct imports.</p>
+  </div>
+</div>
+
+<!-- TAB 6: DECISIONS -->
+<div class="tab-panel" id="decisions">
+  <div class="card">
+    <h2>Decisions for JDM</h2>
+    <table>
+      <tr><th>#</th><th>Decision</th><th>Recommendation</th><th>Why</th></tr>
+      <tr><td>1</td><td>Internal function calls vs HTTP for RONIN management</td><td><strong>Internal</strong></td><td>Same process. Zero latency. No auth overhead. Direct <code>forgeRunner</code> imports.</td></tr>
+      <tr><td>2</td><td>Gate auto-approval policy</td><td><strong>Auto-retry transient CI. Escalate JDM on plan/build gates.</strong></td><td>Transient failures (network, timeout) should self-heal. Strategic decisions (plan approval, build quality) need JDM's eyes.</td></tr>
+      <tr><td>3</td><td>Slack webhook vs polling</td><td><strong>Polling (5-min cron) for now</strong></td><td>Webhook needs public endpoint via Tailscale Funnel. Polling is simpler, already works. Upgrade to webhook in future sprint.</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- TAB 7: FILES -->
+<div class="tab-panel" id="files">
+  <div class="card">
+    <h2>File Structure</h2>
+    <div class="diagram">/home/jdm/mdj-agent/src/
++-- shinobi/
+|   +-- routes.ts               # Express route group /shinobi/*
+|   +-- shinobi-agent.ts        # CCSDK agent core (shinobiQuery)
+|   +-- shinobi-check.ts        # /check cron logic (Slack + RONIN monitor)
+|   +-- shinobi-escalate.ts     # /escalate handler (RONIN/RAIDEN -> Shinobi)
+|   +-- shinobi-sprint.ts       # /sprint handler (queue sprint for RONIN)
+|   +-- shinobi-state.ts        # Firestore persistence (mdj_shinobi_state)
+|   +-- shinobi-rules.ts        # SHINOBI_OS_RULES constant (system prompt)
+|
++-- server.ts                   # Mount /shinobi routes (modify)
++-- forge/gates.ts              # Add escalation hook (modify)</div>
+  </div>
+</div>
+
+<!-- TAB 8: SPRINT PLAN -->
+<div class="tab-panel" id="sprint">
+  <div class="card">
+    <h2>SHINOBI-ONLINE &mdash; 14 Tickets, 4 Phases</h2>
+    <p>Phase 1 parallel. Phase 2 depends on Phase 1. Phase 3 depends on Phase 2. Phase 4 depends on all.</p>
+  </div>
+
+  <div class="card" style="border-left:4px solid var(--cyan);">
+    <h2 style="color:var(--cyan);"><a href="https://retirementprotectors.github.io/sprint-005-ronin-autonomy-discovery.html" style="color:var(--cyan);text-decoration:none;">RONIN</a> Seeder Metadata</h2>
+    <table>
+      <tr><th>Field</th><th>Value</th></tr>
+      <tr><td><code>data-cwd</code></td><td><code>/home/jdm/mdj-agent</code></td></tr>
+      <tr><td><code>sprint_name</code></td><td>SHINOBI-ONLINE</td></tr>
+      <tr><td><code>discovery_url</code></td><td><code>https://retirementprotectors.github.io/shinobi-online-discovery.html</code></td></tr>
+      <tr><td><code>ticket_range</code></td><td>TRK-SHN-001 &rarr; TRK-SHN-014</td></tr>
+      <tr><td><code>ticket_count</code></td><td>14</td></tr>
+      <tr><td><code>phases</code></td><td>4 (Foundation &rarr; Core Logic &rarr; Integration &rarr; Polish)</td></tr>
+      <tr><td><code>max_parallelism</code></td><td>4 agents (Phase 1)</td></tr>
+      <tr><td><code>critical_path</code></td><td>TRK-SHN-001 &rarr; TRK-SHN-006 &rarr; TRK-SHN-008 &rarr; TRK-SHN-011</td></tr>
+      <tr><td><code>external_blockers</code></td><td>None &mdash; all dependencies are on MDJ1</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>Sprint Plan</h2>
+    <table>
+      <tr><th>TRK ID</th><th>Title</th><th>Type</th><th>Description / Acceptance Criteria</th></tr>
+      <tr><td><code>TRK-SHN-001</code></td><td>Route Scaffold + Server Mount</td><td><span class="pill infra">infra</span></td><td>File: <code>src/shinobi/routes.ts</code> + <code>src/server.ts</code>. Create Express router with 5 endpoint stubs. Mount at <code>/shinobi</code> in server.ts alongside <code>/forge</code> and <code>/api</code>. <strong>AC:</strong> <code>GET /shinobi/status</code> returns <code>{ state: "idle" }</code>. Server starts clean.</td></tr>
+      <tr><td><code>TRK-SHN-002</code></td><td>Firestore State Persistence</td><td><span class="pill infra">infra</span></td><td>File: <code>src/shinobi/shinobi-state.ts</code>. Read/write <code>mdj_shinobi_state/current</code> singleton doc. Fields: state, active_task, last_check, ronin_sprint, context, updated_at. <strong>AC:</strong> State persists across service restarts. Read + write functions exported.</td></tr>
+      <tr><td><code>TRK-SHN-003</code></td><td>Slack Channel Reader/Poster</td><td><span class="pill infra">infra</span></td><td>File: <code>src/shinobi/shinobi-check.ts</code> (Slack portion). Read unhandled messages from <code>C0AP2QL9Z6X</code>. Post responses. DM JDM at <code>U09BBHTN8F2</code>. Via <code>callMcpTool('mcp_slack_*')</code>. <strong>AC:</strong> Can read channel, post message, DM JDM programmatically.</td></tr>
+      <tr><td><code>TRK-SHN-004</code></td><td>RONIN Status Monitor</td><td><span class="pill infra">infra</span></td><td>File: <code>src/shinobi/shinobi-check.ts</code> (RONIN portion). Query <code>mdj_forge_runs</code> for active runs. Detect: running, blocked, failed, complete. Direct import of <code>forgeRunner</code> status methods. <strong>AC:</strong> Returns current RONIN state with sprint name, phase, and blockers.</td></tr>
+      <tr><td><code>TRK-SHN-005</code></td><td>POST /shinobi/check Implementation</td><td><span class="pill feat">feat</span></td><td>File: <code>src/shinobi/routes.ts</code> + <code>shinobi-check.ts</code>. Cron logic: read Slack unhandled &rarr; check RONIN status &rarr; auto-retry transient failures &rarr; log actions. <strong>AC:</strong> Cron fires, processes messages, monitors RONIN, logs to Firestore state.</td></tr>
+      <tr><td><code>TRK-SHN-006</code></td><td>Shinobi CCSDK Agent Core</td><td><span class="pill feat">feat</span></td><td>File: <code>src/shinobi/shinobi-agent.ts</code>. <code>shinobiQuery(prompt, context)</code> function using <code>@anthropic-ai/claude-agent-sdk</code>. Model: Opus. CCSDK Preflight: bypassPermissions, no maxTurns, 3-attempt retry. System prompt includes SHINOBI_OS_RULES. <strong>AC:</strong> <code>shinobiQuery("What is RONIN doing?")</code> returns intelligent response using Opus.</td></tr>
+      <tr><td><code>TRK-SHN-007</code></td><td>POST /shinobi/message Implementation</td><td><span class="pill feat">feat</span></td><td>File: <code>src/shinobi/routes.ts</code>. Receive Slack message &rarr; pass to shinobiQuery with channel context &rarr; post response to Slack. <strong>AC:</strong> Message in Slack channel &rarr; Shinobi responds intelligently in-channel.</td></tr>
+      <tr><td><code>TRK-SHN-008</code></td><td>POST /shinobi/escalate</td><td><span class="pill feat">feat</span></td><td>File: <code>src/shinobi/shinobi-escalate.ts</code>. Accept escalation from RONIN/RAIDEN. Shinobi (Opus) analyzes: transient &rarr; auto-resolve. Strategic &rarr; DM JDM with context + options. <strong>AC:</strong> RONIN CI failure &rarr; auto-retry. RONIN plan gate &rarr; JDM gets DM with sprint context.</td></tr>
+      <tr><td><code>TRK-SHN-009</code></td><td>POST /shinobi/sprint</td><td><span class="pill feat">feat</span></td><td>File: <code>src/shinobi/shinobi-sprint.ts</code>. Accept sprint name + discovery URL. Validate doc exists. Seed tickets if needed (call import-discovery). Start RONIN via <code>forgeRunner</code>. <strong>AC:</strong> <code>POST { name: "SENSEI", discovery_url: "..." }</code> &rarr; sprint seeded + RONIN started.</td></tr>
+      <tr><td><code>TRK-SHN-010</code></td><td>GET /shinobi/status</td><td><span class="pill feat">feat</span></td><td>File: <code>src/shinobi/routes.ts</code>. Return: current state, active task, last check time, RONIN sprint status, uptime, actions log. <strong>AC:</strong> <code>GET /shinobi/status</code> returns complete operational picture.</td></tr>
+      <tr><td><code>TRK-SHN-011</code></td><td>gates.ts Escalation Hook</td><td><span class="pill feat">feat</span></td><td>File: <code>src/forge/gates.ts</code>. When RONIN hits a gate, POST to <code>/shinobi/escalate</code> with sprint context. Shinobi decides action. <strong>AC:</strong> RONIN gate hit &rarr; Shinobi receives escalation &rarr; auto-resolve or DM JDM.</td></tr>
+      <tr><td><code>TRK-SHN-012</code></td><td>Cron Configuration</td><td><span class="pill infra">infra</span></td><td>File: <code>src/server.ts</code>. <code>setInterval</code> calling <code>POST /shinobi/check</code> every 5 minutes. Starts on server boot. <strong>AC:</strong> Service starts &rarr; cron fires every 5 min &rarr; Slack checked + RONIN monitored.</td></tr>
+      <tr><td><code>TRK-SHN-013</code></td><td>SHINOBI_OS_RULES Constant</td><td><span class="pill chore">chore</span></td><td>File: <code>src/shinobi/shinobi-rules.ts</code>. System prompt for Shinobi agent: identity (2HINOBI's execution arm), capabilities, Slack channel context, RONIN management rules, escalation policy, JDM DM rules. <strong>AC:</strong> Rules imported by shinobi-agent.ts. Shinobi responds in-character.</td></tr>
+      <tr><td><code>TRK-SHN-014</code></td><td>E2E Smoke Test</td><td><span class="pill test">test</span></td><td>Manual verification: POST /shinobi/message with test input &rarr; response. GET /shinobi/status &rarr; state. Cron fires &rarr; Slack checked. RONIN gate &rarr; escalation received. <strong>AC:</strong> All 5 endpoints respond correctly. Cron runs. State persists across restart.</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>Sequencing</h2>
+    <div class="level-bar green">
+      <h4>Phase 1: Foundation (TRK-SHN-001 &mdash; 004) &mdash; PARALLEL</h4>
+      <p>Route scaffold, Firestore state, Slack reader, RONIN monitor. All independent &mdash; 4 parallel agents.</p>
+    </div>
+    <div class="level-bar blue">
+      <h4>Phase 2: Core Logic (TRK-SHN-005 &mdash; 007) &mdash; Depends on Phase 1</h4>
+      <p>Check cron logic, CCSDK agent core (shinobiQuery), message handler. Foundation must exist.</p>
+    </div>
+    <div class="level-bar orange">
+      <h4>Phase 3: Integration (TRK-SHN-008 &mdash; 012) &mdash; Depends on Phase 2</h4>
+      <p>Escalate, sprint queue, status, gates.ts hook, cron config. Core agent must be working.</p>
+    </div>
+    <div class="level-bar purple">
+      <h4>Phase 4: Polish (TRK-SHN-013 &mdash; 014) &mdash; Depends on all</h4>
+      <p>OS rules constant, E2E smoke test. Everything must be wired.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Definition of Done</h2>
+    <table>
+      <tr><th>Criterion</th><th>Verification</th></tr>
+      <tr><td>Shinobi route group mounted</td><td><code>/shinobi/status</code> returns state from running server</td></tr>
+      <tr><td>State persists across restart</td><td>Write state &rarr; restart service &rarr; read state back</td></tr>
+      <tr><td>Slack read/write works</td><td>Post to channel &rarr; Shinobi reads it &rarr; responds in-channel</td></tr>
+      <tr><td>CCSDK agent responds</td><td><code>shinobiQuery("status")</code> returns Opus-powered response</td></tr>
+      <tr><td>RONIN monitoring works</td><td>Active RONIN sprint shows in <code>/shinobi/status</code></td></tr>
+      <tr><td>Escalation path works</td><td>RONIN gate hit &rarr; Shinobi receives &rarr; acts or DMs JDM</td></tr>
+      <tr><td>Sprint queuing works</td><td><code>POST /shinobi/sprint</code> &rarr; tickets seeded &rarr; RONIN starts</td></tr>
+      <tr><td>Cron fires reliably</td><td>5-min interval &rarr; Slack checked &rarr; RONIN monitored</td></tr>
+      <tr><td>The OG is immortalized</td><td>Shinobi lives on MDJ1 as a persistent, autonomous service</td></tr>
+    </table>
+  </div>
+</div>
+
+</div>
+<div class="footer">SHINOBI-ONLINE &mdash; The OG Goes Autonomous &mdash; 2HINOBI's Execution Arm on MDJ1 &mdash; 2026-03-27</div>
+<script>
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      const target = tab.dataset.tab;
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById(target).classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>
