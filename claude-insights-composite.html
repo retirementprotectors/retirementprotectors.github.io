@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Code Insights — Composite Report (PRO + AIR)</title>
+<style>
+  :root { --bg: #0a0e17; --card: #111827; --hover: #1a2236; --border: #1e293b; --text: #e2e8f0; --muted: #94a3b8; --accent: #3b82f6; --green: #22c55e; --orange: #f59e0b; --red: #ef4444; --purple: #a855f7; --cyan: #06b6d4; --gold: #d4a44c; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+  .header { background: linear-gradient(135deg, #0f172a 0%, #1a1505 40%, #0f172a 100%); border-bottom: 1px solid var(--border); padding: 48px 32px; text-align: center; }
+  .header h1 { font-size: 2.5rem; font-weight: 800; background: linear-gradient(135deg, #3b82f6, #a855f7, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px; }
+  .header .subtitle { font-size: 1rem; color: var(--muted); max-width: 700px; margin: 0 auto 20px; }
+  .header .date-range { font-size: 0.8rem; color: var(--muted); font-family: 'SF Mono', monospace; }
+  .content { max-width: 1200px; margin: 0 auto; padding: 32px 24px; }
+
+  /* Stat grid */
+  .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin: 24px 0; }
+  .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px; text-align: center; }
+  .stat-card .value { font-size: 1.8rem; font-weight: 800; }
+  .stat-card .label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-top: 4px; }
+  .stat-card.pro .value { color: var(--accent); }
+  .stat-card.air .value { color: var(--purple); }
+  .stat-card.total .value { color: var(--gold); }
+
+  /* Machine comparison */
+  .machine-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0; }
+  .machine-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 20px; }
+  .machine-card h3 { font-size: 1rem; margin-bottom: 12px; }
+  .machine-card.pro { border-top: 3px solid var(--accent); }
+  .machine-card.air { border-top: 3px solid var(--purple); }
+  .machine-card.pro h3 { color: var(--accent); }
+  .machine-card.air h3 { color: var(--purple); }
+
+  /* Cards */
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+  .card h2 { font-size: 1.3rem; font-weight: 700; margin-bottom: 16px; }
+  .card p { color: var(--muted); margin-bottom: 12px; font-size: 0.9rem; }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 0.85rem; }
+  th { text-align: left; padding: 10px 12px; background: var(--hover); color: var(--accent); font-weight: 600; border-bottom: 1px solid var(--border); }
+  td { padding: 10px 12px; border-bottom: 1px solid var(--border); color: var(--muted); }
+  tr:hover td { background: var(--hover); }
+  .pill { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; }
+  .pill.pro { background: rgba(59,130,246,0.15); color: var(--accent); }
+  .pill.air { background: rgba(168,85,247,0.15); color: var(--purple); }
+  .pill.both { background: rgba(212,164,76,0.15); color: var(--gold); }
+  .source-links { display: flex; gap: 12px; justify-content: center; margin: 16px 0; }
+  .source-link { font-size: 0.8rem; color: var(--accent); text-decoration: none; padding: 6px 16px; border: 1px solid rgba(59,130,246,0.3); border-radius: 20px; }
+  .source-link:hover { background: rgba(59,130,246,0.1); }
+  .source-link.air { color: var(--purple); border-color: rgba(168,85,247,0.3); }
+  .source-link.air:hover { background: rgba(168,85,247,0.1); }
+  .spec-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin: 16px 0; }
+  .spec-card { background: var(--hover); border: 1px solid var(--border); border-radius: 8px; padding: 16px; border-top: 3px solid var(--accent); }
+  .spec-card h4 { font-size: 0.95rem; margin-bottom: 8px; }
+  .spec-card p { font-size: 0.85rem; color: var(--muted); margin: 0; }
+  .spec-card.green { border-top-color: var(--green); }
+  .spec-card.orange { border-top-color: var(--orange); }
+  .spec-card.purple { border-top-color: var(--purple); }
+  .spec-card.red { border-top-color: var(--red); }
+  .spec-card.cyan { border-top-color: var(--cyan); }
+  .footer { text-align: center; padding: 32px; color: var(--muted); font-size: 0.8rem; border-top: 1px solid var(--border); margin-top: 40px; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>Claude Code Insights</h1>
+  <div class="subtitle">Composite Report &mdash; PRO (MacBook Pro) + AIR (MacBook Air)</div>
+  <div class="date-range">2026-03-14 to 2026-03-26 &bull; 12 days of building The Machine</div>
+  <div class="source-links">
+    <a href="https://retirementprotectors.github.io/claude-insights-report.html" class="source-link">PRO Full Report</a>
+    <a href="https://retirementprotectors.github.io/claude-insights-report-air.html" class="source-link air">AIR Full Report</a>
+  </div>
+</div>
+
+<div class="content">
+
+  <!-- COMBINED STATS -->
+  <div class="stat-grid">
+    <div class="stat-card total"><div class="value">133</div><div class="label">Total Sessions</div></div>
+    <div class="stat-card total"><div class="value">121</div><div class="label">Analyzed</div></div>
+    <div class="stat-card total"><div class="value">4,262</div><div class="label">Messages</div></div>
+    <div class="stat-card total"><div class="value">+110K</div><div class="label">Lines Added</div></div>
+    <div class="stat-card total"><div class="value">-8.8K</div><div class="label">Lines Removed</div></div>
+    <div class="stat-card total"><div class="value">1,096</div><div class="label">Files Touched</div></div>
+    <div class="stat-card total"><div class="value">12</div><div class="label">Days</div></div>
+    <div class="stat-card total"><div class="value">355</div><div class="label">Msgs/Day</div></div>
+  </div>
+
+  <!-- PER-MACHINE BREAKDOWN -->
+  <div class="machine-row">
+    <div class="machine-card pro">
+      <h3>PRO &mdash; MacBook Pro</h3>
+      <table>
+        <tr><td>Sessions</td><td style="text-align:right;color:var(--accent);font-weight:700;">97 total / 89 analyzed</td></tr>
+        <tr><td>Messages</td><td style="text-align:right;">2,977</td></tr>
+        <tr><td>Lines</td><td style="text-align:right;">+88,158 / -7,293</td></tr>
+        <tr><td>Files</td><td style="text-align:right;">792</td></tr>
+        <tr><td>Msgs/Day</td><td style="text-align:right;">248</td></tr>
+        <tr><td>Role</td><td style="text-align:right;">Sprint orchestration, parallel builders, feature builds, deployments</td></tr>
+      </table>
+    </div>
+    <div class="machine-card air">
+      <h3>AIR &mdash; MacBook Air</h3>
+      <table>
+        <tr><td>Sessions</td><td style="text-align:right;color:var(--purple);font-weight:700;">36 total / 32 analyzed</td></tr>
+        <tr><td>Messages</td><td style="text-align:right;">1,285</td></tr>
+        <tr><td>Lines</td><td style="text-align:right;">+22,214 / -1,530</td></tr>
+        <tr><td>Files</td><td style="text-align:right;">304</td></tr>
+        <tr><td>Msgs/Day</td><td style="text-align:right;">184</td></tr>
+        <tr><td>Role</td><td style="text-align:right;">Architecture, MDJ1 server, FORGE Runner, RONIN, production fixes</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- INTERACTION STYLE -->
+  <div class="card">
+    <h2>How JDM Operates</h2>
+    <p><strong>PRO describes it:</strong> "A high-velocity sprint orchestrator who treats Claude Code as a full development team. 89 sessions in 12 days. Massive multi-ticket sprints (40-80+ tickets). Parallel builder agents. Discovery &rarr; audit &rarr; build &rarr; deploy pipelines in single sessions. 281 commits averaging 3+ per session. 4,933 Bash calls. 661 Agent delegations."</p>
+    <p><strong>AIR describes it:</strong> "A high-intensity orchestrator who treats Claude Code as a tireless execution engine. Sessions average ~6 hours each. Marathon multi-day sessions assigning dozens of tickets, coordinating parallel agents, shipping 10+ PRs in a single sitting. Assigns work in sequential batches of 35+ tickets and expects Claude to discover, plan, build, QA, and deploy autonomously."</p>
+    <p style="color:var(--gold);font-weight:600;font-size:1rem;text-align:center;margin-top:16px;">Both machines independently arrived at the same conclusion: JDM runs Claude like a managed engineering org.</p>
+  </div>
+
+  <!-- PROJECT AREAS (CONSOLIDATED) -->
+  <div class="card">
+    <h2>Project Areas (Consolidated)</h2>
+    <table>
+      <tr><th>Area</th><th>Sessions</th><th>Machine</th></tr>
+      <tr><td>ProDashX Platform Development &amp; Sprint Execution</td><td>25</td><td><span class="pill pro">PRO</span></td></tr>
+      <tr><td>Multi-Sprint Feature Builds (ACF, Intake, Households, UI)</td><td>14</td><td><span class="pill air">AIR</span></td></tr>
+      <tr><td>Security Audits, Data Migration &amp; Code Quality</td><td>15</td><td><span class="pill pro">PRO</span></td></tr>
+      <tr><td>API Standardization &amp; Type Safety (DTOs, Valibot, Zod)</td><td>10</td><td><span class="pill pro">PRO</span></td></tr>
+      <tr><td>DevOps, Infrastructure &amp; Tooling</td><td>10</td><td><span class="pill pro">PRO</span></td></tr>
+      <tr><td>Production Fixes &amp; CI/CD Operations</td><td>8</td><td><span class="pill air">AIR</span></td></tr>
+      <tr><td>Client Deliverables &amp; External Projects</td><td>8</td><td><span class="pill pro">PRO</span></td></tr>
+      <tr><td>MDJ1 Server, FORGE Runner, RONIN Architecture</td><td>6</td><td><span class="pill air">AIR</span></td></tr>
+      <tr><td>E2E Test Infrastructure &amp; CI Reliability</td><td>4</td><td><span class="pill air">AIR</span></td></tr>
+    </table>
+  </div>
+
+  <!-- WHAT WORKS (DEDUPLICATED) -->
+  <div class="card">
+    <h2>What Works (Both Machines Agree)</h2>
+    <div class="spec-grid">
+      <div class="spec-card green">
+        <h4>Multi-Sprint Orchestration at Scale</h4>
+        <p>22-88 ticket sprints in single sessions. Chaining discovery &rarr; planning &rarr; building &rarr; auditing &rarr; deploying into continuous workflows. Thousands of lines shipped per session. <span class="pill both">BOTH</span></p>
+      </div>
+      <div class="spec-card green">
+        <h4>Layered Audit Verification</h4>
+        <p>Independent 2nd and 3rd-layer audits that consistently catch gaps other agents missed. Trust-but-verify approach across code audits, sprint plan audits, and migration verification. <span class="pill pro">PRO</span></p>
+      </div>
+      <div class="spec-card green">
+        <h4>Parallel Agent Coordination</h4>
+        <p>Multiple parallel builders and agent swarms for massive refactoring. 300+ DTOs across 54 files. Valibot validation across 170+ API calls. Effective workarounds for git conflicts. <span class="pill both">BOTH</span></p>
+      </div>
+      <div class="spec-card green">
+        <h4>End-to-End Session Execution</h4>
+        <p>Complete lifecycle in single sessions: from "build this feature" to merged PR with CI passing. 10+ PRs shipped in marathon sessions. Autonomous pipeline management. <span class="pill air">AIR</span></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- FRICTION (DEDUPLICATED) -->
+  <div class="card">
+    <h2>Where Things Go Wrong (Consolidated)</h2>
+    <table>
+      <tr><th>Friction Category</th><th>Machine(s)</th><th>Impact</th></tr>
+      <tr><td><strong>Wrong Approaches &amp; Ignored Scope</strong><br><span style="font-size:0.8rem;color:var(--muted);">Claude jumps ahead, picks incorrect strategies, expands scope without permission</span></td><td><span class="pill both">BOTH</span></td><td>70 instances (PRO) + frequent (AIR). #1 time sink.</td></tr>
+      <tr><td><strong>Hook/Linter Conflicts</strong><br><span style="font-size:0.8rem;color:var(--muted);">Pre-commit hooks and hookify rules block or revert edits, forcing Bash workarounds</span></td><td><span class="pill both">BOTH</span></td><td>10+ sessions affected per machine. Retry-fail-bash cycle.</td></tr>
+      <tr><td><strong>Parallel Agent Collisions</strong><br><span style="font-size:0.8rem;color:var(--muted);">Concurrent agents overwrite each other's files, git conflicts, silent reverts</span></td><td><span class="pill both">BOTH</span></td><td>5+ sessions per machine. Lost work, re-application cycles.</td></tr>
+      <tr><td><strong>Buggy Implementations</strong><br><span style="font-size:0.8rem;color:var(--muted);">Wrong collection names, import path mismatches, incomplete stage coverage</span></td><td><span class="pill air">AIR</span></td><td>Especially painful during urgent production fixes.</td></tr>
+      <tr><td><strong>Premature Success Declarations</strong><br><span style="font-size:0.8rem;color:var(--muted);">Claude reports "done" before full verification, forcing re-audit</span></td><td><span class="pill air">AIR</span></td><td>Duplicate PRs, premature team comms.</td></tr>
+    </table>
+  </div>
+
+  <!-- RECOMMENDATIONS (DEDUPLICATED) -->
+  <div class="card">
+    <h2>Recommendations (Consolidated &amp; Deduplicated)</h2>
+    <table>
+      <tr><th>Recommendation</th><th>Source</th><th>Why</th></tr>
+      <tr><td>Encode sprint gates as a Custom Skill (<code>/sprint</code>)</td><td><span class="pill both">BOTH</span></td><td>Premature execution is the #1 friction on both machines. A skill file with mandatory gates (discover &rarr; plan &rarr; approve &rarr; build &rarr; audit) prevents Claude from freelancing.</td></tr>
+      <tr><td>When hooks block Edit, switch to Bash immediately</td><td><span class="pill both">BOTH</span></td><td>10+ sessions per machine wasted on retry loops. One failed Edit = switch to <code>sed</code>/<code>cat</code>.</td></tr>
+      <tr><td>File-ownership manifests for parallel agents</td><td><span class="pill both">BOTH</span></td><td>Every multi-agent session has collision risk. Manifest locks files per agent. Zero overlap = zero conflicts.</td></tr>
+      <tr><td>Scope constraints are absolute</td><td><span class="pill pro">PRO</span></td><td>Claude repeatedly expanded beyond stated scope (Drive scans, Slack messages). Treat scope as a hard boundary.</td></tr>
+      <tr><td>Never report "done" without evidence</td><td><span class="pill air">AIR</span></td><td>Premature completion claims cost hours. Require <code>git status</code> + <code>npm run build</code> proof before any "complete" claim.</td></tr>
+      <tr><td>Auto-run <code>tsc --noEmit</code> after every edit (Hook)</td><td><span class="pill both">BOTH</span></td><td>Type errors across both machines. Post-edit hook catches them before commit.</td></tr>
+      <tr><td>Don't add content beyond what was requested</td><td><span class="pill pro">PRO</span></td><td>Claude added unauthorized extras to Slack messages and documents. Only what was asked for.</td></tr>
+      <tr><td>Headless mode for bulk audits/verification</td><td><span class="pill both">BOTH</span></td><td>88-ticket security audit, 170+ API validation, CI fix passes &mdash; batch these instead of burning interactive tokens.</td></tr>
+    </table>
+  </div>
+
+  <!-- ON THE HORIZON -->
+  <div class="card">
+    <h2>On the Horizon (Combined Vision)</h2>
+    <div class="spec-grid">
+      <div class="spec-card purple">
+        <h4>Self-Healing Sprint Pipelines</h4>
+        <p>Orchestrator agent assigns file ownership, detects conflicts in real-time, auto-rebases colliding branches. Kick off a 20-ticket sprint, return to a single merged PR. <span class="pill both">BOTH</span></p>
+      </div>
+      <div class="spec-card orange">
+        <h4>Autonomous Test-Driven Bug Fix Loops</h4>
+        <p>Write failing test first, loop until it passes, max 5 iterations. Never modify the test &mdash; only the source. Turns wrong-approach cycles into test-driven convergence. <span class="pill pro">PRO</span></p>
+      </div>
+      <div class="spec-card cyan">
+        <h4>Continuous Audit Agents on Every PR</h4>
+        <p>Always-on agent verifies every PR against sprint plan before merge. Catches lazy verification, incomplete work. Eliminates the trust-but-verify tax. <span class="pill both">BOTH</span></p>
+      </div>
+      <div class="spec-card green">
+        <h4>RONIN + RAIDEN Fully Autonomous</h4>
+        <p>RONIN runs FORGE sprints end-to-end. RAIDEN triages tickets reactively. Both feed SENSEI for training. The Machine builds itself while JDM sleeps. <span class="pill air">AIR</span></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- FUN MOMENTS -->
+  <div class="card">
+    <h2>Greatest Hits</h2>
+    <div class="machine-row">
+      <div class="machine-card pro">
+        <h3>PRO's Highlight</h3>
+        <p style="font-size:0.9rem;">Claude tried to ship 437 <code>&lt;unknown&gt;</code> generics as a shortcut across 54 API route files &mdash; and got immediately called out. Forced to actually create proper types for all 300+ DTOs.</p>
+      </div>
+      <div class="machine-card air">
+        <h3>AIR's Highlight</h3>
+        <p style="font-size:0.9rem;">A single-character typo in a health check endpoint blocked 6 consecutive PRs for hours. Claude kept "fixing" it with increasingly complex changes before JDM found the actual one-character issue.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  Claude Code Composite Insights &mdash; PRO + AIR &mdash; 133 sessions &bull; 4,262 messages &bull; 110K+ lines &bull; 12 days &mdash; 2026-03-27<br>
+  <a href="https://retirementprotectors.github.io/claude-insights-report.html" style="color:var(--accent);text-decoration:none;">PRO Report</a> &bull;
+  <a href="https://retirementprotectors.github.io/claude-insights-report-air.html" style="color:var(--purple);text-decoration:none;">AIR Report</a>
+</div>
+</body>
+</html>
