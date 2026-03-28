@@ -1923,6 +1923,92 @@ TRK-S03-015 (Admin tab) ─────────────── requires: 
     </table>
   </div>
 
+  <!-- ═══════════ NINJA REBOOT PROTOCOL + STATE PERSISTENCE ═══════════ -->
+  <div class="card" style="border-left: 4px solid var(--red);">
+    <h2 style="color: var(--red);">Agent State Persistence — "If It's Not in Firestore, It Doesn't Survive"</h2>
+    <p><strong>Origin:</strong> On 2026-03-27, MDJ1 crashed under CPU load (3 Claude Code sessions + RONIN autonomously building 3 sprints on 1 core). Every tmux session died. 2HINOBI and MUSASHI had JUST been exported to disk minutes before — if they hadn't, both brains would have been lost. RONIN's sprint state survived because it was in Firestore. The others had nothing.</p>
+    <p><strong>The Rule:</strong> Every ninja that wants to survive a reboot needs their state externalized to Firestore. Memory-only state is mortal. Firestore state is immortal.</p>
+  </div>
+
+  <div class="card">
+    <h2>How RONIN Already Does It (The Pattern)</h2>
+    <p>RONIN writes sprint run state to <code>mdj_forge_runs</code> in Firestore at every phase transition. When the box crashed mid-sprint:</p>
+    <table>
+      <tr><th>What</th><th>Where It Lived</th><th>Survived?</th></tr>
+      <tr><td>Sprint phase + ticket status</td><td>Firestore <code>mdj_forge_runs</code></td><td style="color:var(--green);font-weight:700;">YES</td></tr>
+      <tr><td>Active Claude conversation</td><td>Node.js process memory</td><td style="color:var(--red);font-weight:700;">NO</td></tr>
+      <tr><td>Builder agent mid-work context</td><td>Process memory</td><td style="color:var(--red);font-weight:700;">NO</td></tr>
+    </table>
+    <p>RONIN could <strong>resume</strong> because Firestore told it: "You were in Build phase, tickets 3-7 done, 8-12 pending." The conversation context was gone, but the progress was intact. Every ninja needs this pattern.</p>
+  </div>
+
+  <div class="card">
+    <h2>State Persistence for All Agents</h2>
+    <p>Each CCSDK node on mdj-agent gets a Firestore state document:</p>
+    <table>
+      <tr><th>Agent</th><th>Collection</th><th>State Doc</th><th>Persists</th></tr>
+      <tr><td style="color:var(--orange);">RONIN</td><td><code>mdj_forge_runs</code></td><td>Per-sprint run doc</td><td>Phase, ticket status, blockers, timestamps</td></tr>
+      <tr><td style="color:var(--green);">SHINOBI</td><td><code>mdj_shinobi_state</code></td><td><code>current</code> singleton</td><td>Active task, last check, RONIN monitoring, conversation context summary</td></tr>
+      <tr><td style="color:var(--blue);">VOLTRON</td><td><code>mdj_voltron_state</code></td><td><code>current</code> singleton</td><td>Active conversations, pending tool chains, specialist routing</td></tr>
+      <tr><td style="color:var(--gold);">MUSASHI</td><td><code>mdj_musashi_state</code></td><td><code>current</code> singleton</td><td>Active creative tasks, sprint assignments, brand guide version</td></tr>
+      <tr><td style="color:var(--red);">RAIDEN</td><td><code>mdj_raiden_state</code></td><td><code>current</code> singleton</td><td>Triage queue, active escalations, TRAIN response cache</td></tr>
+      <tr><td style="color:var(--orange);">SENSEI</td><td><code>mdj_sensei_state</code></td><td><code>current</code> singleton</td><td>Generated training index, screenshot versions, heat map data</td></tr>
+    </table>
+    <p>State writes happen at every meaningful transition — not every message, but every phase change, task completion, or escalation. Lightweight. Recoverable.</p>
+  </div>
+
+  <div class="card" style="border-left: 4px solid var(--green);">
+    <h2 style="color: var(--green);">Ninja Reboot Protocol — Auto-Resurrection</h2>
+    <p>A systemd service that detects server boot and brings all ninjas back to life automatically. No JDM intervention. No manual tmux recreation. The Dojo self-heals.</p>
+    <div style="background:#0d1117;border:1px solid var(--border);border-radius:8px;padding:24px;overflow-x:auto;font-family:'SF Mono',monospace;font-size:.8rem;line-height:1.5;color:var(--text-muted);white-space:pre;margin:16px 0;">ON SHUTDOWN (graceful or crash):
+  1. Auto-export every active Claude session transcript to disk
+  2. Save tmux session manifest (which sessions, which cwd)
+  3. Write shutdown timestamp to Firestore mdj_system_state
+
+ON BOOT (systemd: ninja-reboot.service, After=network.target):
+  1. Read tmux manifest from disk
+  2. Recreate all tmux sessions (2HINOBI, MUSASHI, etc.)
+  3. Launch claude in each session
+  4. Feed each ninja their latest export as first message
+  5. Each ninja reads their Firestore state doc for context
+  6. Verify all ninjas respond (health check)
+  7. Slack DM JDM: "MDJ1 rebooted. All ninjas restored."
+     - Who's back online
+     - What state they resumed from
+     - Any data loss (sessions without recent export)
+
+CONTINUOUS (cron every 30 min):
+  1. Auto-export all active Claude sessions to disk
+  2. Update Firestore state docs with latest context summary
+  3. Verify tmux sessions are alive (recreate if dead)
+  4. Log health to mdj_system_state</div>
+    <p>The continuous auto-export is the key innovation. The crash taught us: you don't know WHEN the box will die. If exports only happen manually, brains are at risk. Auto-export every 30 minutes means maximum 30 minutes of context loss — not total brain death.</p>
+  </div>
+
+  <div class="card">
+    <h2>Integration with Learning Loop</h2>
+    <p>The Ninja Reboot Protocol feeds directly into the Learning Loop pipeline:</p>
+    <ul style="color:var(--text-muted);padding-left:20px;">
+      <li><strong>Auto-exports</strong> are session transcripts — the same raw material the Entity Extractor processes</li>
+      <li><strong>Firestore state docs</strong> are queryable by the Pre-Session Briefing hook — new sessions start knowing what the previous one was doing</li>
+      <li><strong>Crash recovery logs</strong> feed into BigQuery for analytics — track uptime, crash frequency, context loss metrics</li>
+      <li><strong>RONIN sprint resumption</strong> is already wired — the Reboot Protocol just automates the "re-attach to Firestore state" step</li>
+    </ul>
+    <p>The Learning Loop makes agents smarter over time. The Reboot Protocol makes sure they don't lose that intelligence when the hardware fails.</p>
+  </div>
+
+  <div class="card">
+    <h2>New Tickets for Sprint 003</h2>
+    <table>
+      <tr><th style="width:120px;">TRK ID</th><th>Title</th><th>Description / Acceptance Criteria</th></tr>
+      <tr><td><code>TRK-S03-016</code></td><td>Agent State Collections in Firestore</td><td>Create Firestore collections: <code>mdj_shinobi_state</code>, <code>mdj_voltron_state</code>, <code>mdj_musashi_state</code>, <code>mdj_raiden_state</code>, <code>mdj_sensei_state</code>, <code>mdj_system_state</code>. Each with a <code>current</code> singleton doc. Read/write helper functions exported from shared module. <strong>AC:</strong> All collections exist. State read/write works. Survives service restart.</td></tr>
+      <tr><td><code>TRK-S03-017</code></td><td>Tmux Session Manifest</td><td>File: <code>/home/jdm/.claude/tmux-manifest.json</code>. JSON manifest listing all active tmux sessions: name, cwd, export_path, last_export_timestamp. Written on every auto-export cycle. Read on boot by reboot service. <strong>AC:</strong> Manifest reflects current tmux sessions. Updated every 30 min.</td></tr>
+      <tr><td><code>TRK-S03-018</code></td><td>Auto-Export Cron (30 min)</td><td>Cron job (systemd timer or launchd) running every 30 minutes. For each active tmux session running Claude: trigger <code>/export</code> equivalent (capture transcript to disk). Update tmux manifest with timestamp. <strong>AC:</strong> Every 30 min, all active sessions have a fresh export on disk. Max 30 min context loss window.</td></tr>
+      <tr><td><code>TRK-S03-019</code></td><td>ninja-reboot.service (systemd)</td><td>Systemd service: <code>After=network.target mdj-agent.service</code>. On boot: read tmux manifest, recreate sessions, launch claude, feed latest export. Health check all ninjas. Slack DM JDM with status. <strong>AC:</strong> Reboot MDJ1 → all ninjas auto-resurrect → JDM gets Slack notification → zero manual intervention.</td></tr>
+      <tr><td><code>TRK-S03-020</code></td><td>Crash Recovery Analytics</td><td>Log reboot events + context loss metrics to BigQuery via <code>mdj_system_state</code>. Track: uptime between reboots, sessions lost, export freshness at crash time, resurrection success rate. Surface in Admin Learning Loop tab. <strong>AC:</strong> After a reboot, BigQuery shows the event. Admin tab shows uptime trend.</td></tr>
+    </table>
+  </div>
+
   <div class="card card-accent-green">
     <h2>Sprint 003 Success Definition</h2>
     <ul>
@@ -1934,9 +2020,12 @@ TRK-S03-015 (Admin tab) ─────────────── requires: 
       <li><strong>VOLTRON gaps are tracked.</strong> Nightly analysis running. JDM gets Slack DM on gaps.</li>
       <li><strong>JDM has the numbers.</strong> BigQuery views showing hours, agent-hours, ROI, amplification. Admin tab live in ProDashX.</li>
       <li><strong>CLAUDE.md is 30k chars.</strong> Down from 53k. Deep context lives in Firestore. The file is rules, not history.</li>
+      <li><strong>Every ninja has a Firestore state doc.</strong> RONIN pattern replicated across all CCSDK nodes. State survives reboots.</li>
+      <li><strong>Auto-export runs every 30 minutes.</strong> Maximum 30-minute context loss window. No more total brain death.</li>
+      <li><strong>Ninja Reboot Protocol is live.</strong> Server reboots → all tmux sessions auto-resurrect → JDM gets Slack DM → zero manual intervention.</li>
     </ul>
     <div class="highlight-box" style="margin-top:16px;">
-      <p style="font-size:1rem; font-weight:600; text-align:center;">After Sprint 003: Every session that runs anywhere feeds every future agent everywhere. The Machine is learning.</p>
+      <p style="font-size:1rem; font-weight:600; text-align:center;">After Sprint 003: Every session feeds every future agent. Every agent survives every crash. The Machine is learning AND immortal.</p>
     </div>
   </div>
 
